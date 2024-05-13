@@ -1,0 +1,37 @@
+[gd_scene load_steps=5 format=3 uid="uid://dohjk3rx0rj3k"]
+
+[ext_resource type="Script" path="res://scripts/player.gd" id="1_onugq"]
+[ext_resource type="Texture2D" uid="uid://b784vapcdbjkq" path="res://assets/textures/player/player.png" id="2_ccsth"]
+[ext_resource type="PackedScene" uid="uid://bkb344rfhejjb" path="res://scenes/ui/hud.tscn" id="3_k6lh3"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_d3afe"]
+size = Vector2(12, 22)
+
+[node name="player" type="CharacterBody2D"]
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_onugq")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+visible = false
+offset_left = -20.0
+offset_top = -18.0
+offset_right = 20.0
+offset_bottom = 22.0
+
+[node name="collider" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_d3afe")
+debug_color = Color(0, 0.701961, 0.211765, 0.419608)
+
+[node name="sprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_ccsth")
+
+[node name="camera" type="Camera2D" parent="."]
+position_smoothing_enabled = true
+position_smoothing_speed = 16.0
+drag_left_margin = 0.01
+drag_top_margin = 0.01
+drag_right_margin = 0.01
+drag_bottom_margin = 0.01
+
+[node name="HUD" parent="camera" instance=ExtResource("3_k6lh3")]

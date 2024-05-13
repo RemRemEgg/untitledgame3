@@ -1,0 +1,27 @@
+[gd_scene load_steps=3 format=3 uid="uid://d01df5an22kpe"]
+
+[ext_resource type="Texture2D" uid="uid://c3ktgeiagjnwj" path="res://assets/textures/item/cherry.png" id="2_r2g1p"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ux57g"]
+size = Vector2(14, 14)
+
+[node name="Projectile" type="CharacterBody2D"]
+process_priority = 100
+process_physics_priority = 100
+collision_layer = 0
+collision_mask = 0
+
+[node name="collider" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_ux57g")
+
+[node name="sprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_r2g1p")
+
+[node name="hitbox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+input_pickable = false
+monitorable = false
+
+[node name="collider" type="CollisionShape2D" parent="hitbox"]
+debug_color = Color(0, 0.701961, 0.0117647, 0.419608)

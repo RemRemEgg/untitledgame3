@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://rk4ud8rrxhbd"]
+
+[ext_resource type="Script" path="res://scripts/Entity.gd" id="1_u2m8v"]
+[ext_resource type="Texture2D" uid="uid://hfrkmprrjalp" path="res://assets/textures/mobs/golemn.png" id="2_dmp48"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_e2kva"]
+size = Vector2(12, 22)
+
+[node name="Entity" type="CharacterBody2D"]
+process_priority = 50
+process_physics_priority = 50
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_u2m8v")
+
+[node name="collider" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_e2kva")
+debug_color = Color(0.701961, 0, 0.337255, 0.419608)
+
+[node name="sprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_dmp48")

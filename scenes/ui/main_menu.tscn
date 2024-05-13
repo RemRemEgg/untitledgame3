@@ -1,0 +1,177 @@
+[gd_scene load_steps=9 format=3 uid="uid://ch07baps1p0bg"]
+
+[ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_cnpwn"]
+[ext_resource type="Texture2D" uid="uid://bxs1frc7lrmxi" path="res://assets/textures/ui/background.png" id="2_7gg1u"]
+[ext_resource type="Theme" uid="uid://buffpyiljjxes" path="res://assets/other/ui_theme.tres" id="3_8aq2h"]
+[ext_resource type="Shader" path="res://assets/shaders/slow_glitch.gdshader" id="3_dyben"]
+[ext_resource type="Texture2D" uid="uid://d15xv4nnym4c3" path="res://assets/textures/ui/loading.png" id="4_5v88m"]
+[ext_resource type="Texture2D" uid="uid://bfppsujvb7qhi" path="res://assets/textures/ui/button.png" id="4_ir5is"]
+[ext_resource type="Script" path="res://scripts/main_menu_buttons.gd" id="5_u2a4g"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4xq4q"]
+shader = ExtResource("3_dyben")
+
+[node name="main_menu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_cnpwn")
+
+[node name="background" type="TextureRect" parent="."]
+texture_filter = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_7gg1u")
+stretch_mode = 6
+
+[node name="menu" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="margin" type="MarginContainer" parent="menu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="vbox" type="VBoxContainer" parent="menu/margin"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 64
+alignment = 1
+
+[node name="title" type="Label" parent="menu/margin/vbox"]
+layout_mode = 2
+theme = ExtResource("3_8aq2h")
+text = "untitledgame3"
+
+[node name="vbox" type="VBoxContainer" parent="menu/margin/vbox"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="new_game" type="TextureButton" parent="menu/margin/vbox/vbox"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+texture_normal = ExtResource("4_ir5is")
+script = ExtResource("5_u2a4g")
+function = "new_game"
+
+[node name="text" type="Label" parent="menu/margin/vbox/vbox/new_game"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -42.5
+offset_top = -11.5
+offset_right = 42.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("3_8aq2h")
+theme_override_font_sizes/font_size = 16
+text = "New Game"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="settings" type="TextureButton" parent="menu/margin/vbox/vbox"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+texture_normal = ExtResource("4_ir5is")
+script = ExtResource("5_u2a4g")
+function = "settings"
+
+[node name="text" type="Label" parent="menu/margin/vbox/vbox/settings"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -42.5
+offset_top = -11.5
+offset_right = 42.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("3_8aq2h")
+theme_override_font_sizes/font_size = 16
+text = "Settings"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="exit" type="TextureButton" parent="menu/margin/vbox/vbox"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+texture_normal = ExtResource("4_ir5is")
+script = ExtResource("5_u2a4g")
+function = "exit"
+
+[node name="text" type="Label" parent="menu/margin/vbox/vbox/exit"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -42.5
+offset_top = -11.5
+offset_right = 42.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("3_8aq2h")
+theme_override_font_sizes/font_size = 16
+text = "Exit"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="loading" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="curtain" type="ColorRect" parent="loading"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="loading_text" type="TextureRect" parent="loading"]
+material = SubResource("ShaderMaterial_4xq4q")
+layout_mode = 1
+offset_right = 40.0
+offset_bottom = 40.0
+scale = Vector2(4, 4)
+texture = ExtResource("4_5v88m")
+stretch_mode = 2
