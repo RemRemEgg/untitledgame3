@@ -29,8 +29,7 @@ func _process(delta) -> void:
 	proc_ai.process(self)
 
 # TODO update taking damage
-func take_damage_from_entity(_damager: Entity, attack: DamageEvent) -> void: take_damage_from_dead_entity(attack)
-func take_damage_from_dead_entity(attack: DamageEvent) -> void:
+func take_damage(attack: DamageEvent) -> void:
 	health -= attack.damage
 	if lhurt_pop && is_instance_valid(lhurt_pop) && lhurt_pop.anim.current_animation_position < 0.4 && lhurt_pop.global_position.distance_squared_to(global_position) < 32**2:
 		attack.damage += int(lhurt_pop.text)

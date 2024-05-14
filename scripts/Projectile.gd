@@ -91,9 +91,7 @@ func collide_with_body(body_rid: RID, body: Node2D, _bsi: int, _lsi: int) -> voi
 	var has_origin := is_instance_valid(origin)
 	if kill_no_origin && !has_origin: return kill()
 	if has_origin && origin.get_rid() == body_rid: return
-	if body is Entity:
-		if has_origin: body.take_damage_from_entity(origin, generate_damage_event())
-		if !has_origin: body.take_damage_from_dead_entity(generate_damage_event())
+	if body is Entity: body.take_damage(generate_damage_event())
 	pierce -= 1
 	if pierce == -1: kill()
 
