@@ -48,7 +48,7 @@ func _to_string() -> String: return "Item[id=%s,name=%s,type=%s]" % [reg_id, nam
 
 static func register(item: ItemData) -> void:
 	if REGISTRY.size() <= item.reg_id: REGISTRY.resize(item.reg_id + 1)
-	if REGISTRY[item.reg_id] != null: printerr("#!# Duplicate registration for item '%s'" % item)
+	if REGISTRY[item.reg_id] != null: Console.print_err("Duplicate registration for item '%s'" % item)
 	REGISTRY[item.reg_id] = item
 
 static func create(reg_id_: int, texture_path_: String, name_: String, use_type_: int, stats_: Array[float]) -> ItemData:
@@ -72,6 +72,6 @@ static func create(reg_id_: int, texture_path_: String, name_: String, use_type_
 
 static func load_texture(path: String) -> ImageTexture:
 	if !FileAccess.file_exists(path):
-		printerr("#!# Failed to load texture '%s'" % path)
+		Console.print_err("Failed to load texture '%s'" % path)
 		return ImageTexture.new()
 	return ImageTexture.create_from_image(Image.load_from_file(ProjectSettings.globalize_path(path)))

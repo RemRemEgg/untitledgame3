@@ -8,6 +8,9 @@ var init_mem: Array[float] = []
 var target_distance: float = 0.0
 var target_vector: Vector2 = Vector2(0, 0)
 
+class MOVE_TYPE: enum {LAND, AIR, GROUND, ALL, STATIC}
+var move_type: int = MOVE_TYPE.LAND
+
 func process(entity_: Entity) -> void:
 	entity = entity_
 	entity.lock_timer -= entity.idelta
@@ -19,6 +22,7 @@ func process(entity_: Entity) -> void:
 	
 	processor.root_call(self)
 	if mas: entity.move_and_slide()
+
 func update_target() -> void: entity.target = entity.get_tree().root.get_node("world/player") as Entity
 
 static func generate_new(_difficulty: int) -> ProcAI:
@@ -58,9 +62,9 @@ class AIFramework extends AIProcessor:
 	
 	func _init() -> void:
 		type = RANDOM
-		actions.push_back(AIAction.new().set_type(AIAction.ALIGN_AND_POUNCE).finalize())
+		#actions.push_back(AIAction.new().set_type(AIAction.ALIGN_AND_POUNCE).finalize())
 		actions.push_back(AIAction.new().set_type(AIAction.ALIGN_AND_RANGE).finalize())
-		actions.push_back(AIAction.new().set_type(AIAction.APPROACH_AND_MELEE).finalize())
+		#actions.push_back(AIAction.new().set_type(AIAction.APPROACH_AND_MELEE).finalize())
 		finalize()
 	func finalize() -> AIProcessor:
 		process = type_to_callable()
@@ -198,19 +202,17 @@ class AIAction extends AIProcessor:
 	func align_and_pounce() -> void:
 		if AI.entity.is_attack_locked:
 			AI.entity.apply_gravity(1.0)
-			if AI.entity.iof: AI.entity.apply_friction()
-		elif AI.target_distance < 130**2 || AI.target_distance > 140**2:
+			AI.entity.apply_friction()
+		elif (AI.target_distance < 130**2 || AI.target_distance > 140**2) || !AI.entity.iof:
 			basic_path_towards(sign(AI.target_distance-135**2) * sign(AI.target_vector.x), AI.entity.target.global_position.y)
 			if AI.entity.lock_timer <= 0.0: AI.entity.lock_timer = 180
 		else:
-			if AI.entity.iof:
-				AI.entity.lock_timer = 120.0
-				AI.entity.is_attack_locked = true
-				AI.entity.velocity = ((AI.entity.target.get_feet_pos() - AI.entity.get_feet_pos()).normalized() -
-					Vector2(0, 0.3)).normalized() * 0.03 * AI.entity.speed * sqrt(AI.target_distance)
-				attack.fire(AI, AI.target_vector)
-			else: basic_path_towards(sign(AI.target_distance-140**2) * sign(AI.target_vector.x), AI.entity.target.global_position.y)
-#endregion
+			AI.entity.lock_timer = 120.0
+			AI.entity.is_attack_locked = true
+			AI.entity.velocity = ((AI.entity.target.get_feet_pos() - AI.entity.get_feet_pos()).normalized() -
+				Vector2(0, 0.3)).normalized() * 0.03 * AI.entity.speed * sqrt(AI.target_distance)
+			attack.fire(AI, AI.target_vector)
+#endregion##########################################################################################
 
 class Attack:
 	var projectiles: Array[Projectile] = []
@@ -236,7 +238,6 @@ class Attack:
 				proj.texture = ItemData.lookup(ItemData.ids.ROCK).texture
 				proj.set_collisions(true, false, true)
 				attack.projectiles.push_back(proj)
-				pass
 		return attack
 	
 	func fire(ai: ProcAI, dir: Vector2) -> void: for proj in projectiles: proj.fire(ai.entity, dir).add_to_world()

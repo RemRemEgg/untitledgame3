@@ -1,0 +1,51 @@
+[gd_scene load_steps=3 format=3 uid="uid://ew74okhmtdkw"]
+
+[ext_resource type="Script" path="res://scripts/console.gd" id="1_p0j8e"]
+[ext_resource type="Theme" uid="uid://buffpyiljjxes" path="res://assets/other/ui_theme.tres" id="2_u6p5c"]
+
+[node name="console" type="CanvasLayer"]
+script = ExtResource("1_p0j8e")
+
+[node name="background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.65098)
+
+[node name="margin" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 8
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="vbox" type="VBoxContainer" parent="margin"]
+layout_mode = 2
+alignment = 2
+
+[node name="lines" type="RichTextLabel" parent="margin/vbox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/line_separation = -3
+theme_override_font_sizes/normal_font_size = 8
+bbcode_enabled = true
+scroll_following = true
+
+[node name="input" type="LineEdit" parent="margin/vbox"]
+layout_mode = 2
+size_flags_vertical = 8
+theme = ExtResource("2_u6p5c")
+theme_override_font_sizes/font_size = 12
+text = "CONSOLE"
+placeholder_text = "CONSOLE"
+context_menu_enabled = false
+clear_button_enabled = true
+flat = true
+caret_blink = true
