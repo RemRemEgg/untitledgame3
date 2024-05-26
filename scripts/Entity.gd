@@ -17,7 +17,7 @@ var jump_power: float = 256.0
 
 var lhurt_pop: TextPopup
 
-static var TEMP_CONST_PROCAI = ProcAI.generate_new(0)
+static var TEMP_CONST_PROCAI = ProcAI.generate_new()
 
 func _ready() -> void:
 	TEMP_CONST_PROCAI.register_entity(self)

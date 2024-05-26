@@ -9,6 +9,7 @@ var target_distance: float = 0.0
 var target_vector: Vector2 = Vector2(0, 0)
 
 class MOVE_TYPE: enum {LAND, AIR, GROUND, ALL, STATIC}
+const move_names := ["land", "air", "ground", "all", "static"]
 var move_type: int = MOVE_TYPE.LAND
 
 func process(entity_: Entity) -> void:
@@ -25,11 +26,23 @@ func process(entity_: Entity) -> void:
 
 func update_target() -> void: entity.target = entity.get_tree().root.get_node("world/player") as Entity
 
-static func generate_new(_difficulty: int) -> ProcAI:
+static func generate_new() -> ProcAI:
 	var ai: ProcAI = ProcAI.new()
 	
-	var rootfw: AIFramework = AIFramework.new()
+	#var sub := AIFramework.new()
+	#sub.type = AIFramework.DISTANCE_2
+	#sub.actions.push_back(AIAction.new().set_type(AIAction.ALIGN_AND_RANGE).finalize())
+	#sub.actions.push_back(AIAction.new().set_type(AIAction.APPROACH_AND_MELEE).finalize())
+	#
+	#var rootfw: AIFramework = AIFramework.new()
+	#
+	#rootfw.type = AIFramework.CYCLE
+	#rootfw.actions.push_back(sub.finalize())
+	#rootfw.actions.push_back(AIAction.new().set_type(AIAction.ALIGN_AND_POUNCE).finalize())
 	
+	var rootfw := AIFramework.generate_new()
+	
+	rootfw.finalize()
 	AIFramework.AI = ai
 	AIAction.AI = ai
 	rootfw.calc_index()
@@ -47,9 +60,16 @@ func register_entity(ent: Entity):
 	ent.locks.fill(0)
 	ent.mem = init_mem.duplicate()
 
+func _to_string() -> String:
+	var sb := "[color=#aea]ProcAI<%s> iM: %s[/color]" % [move_names[move_type], init_mem]
+	sb += "\n  " + processor.to_string().replace("\n", "\n  ")
+	return sb
+
 var processor: AIProcessor
 
-class AIProcessor: var process: Callable
+class AIProcessor:
+	var process: Callable
+	func finalize() -> AIProcessor: return self
 
 class AIFramework extends AIProcessor:
 	static var AI: ProcAI
@@ -60,15 +80,11 @@ class AIFramework extends AIProcessor:
 	var l_index: int = -1
 	var m_index: int = -1
 	
-	func _init() -> void:
-		type = RANDOM
-		#actions.push_back(AIAction.new().set_type(AIAction.ALIGN_AND_POUNCE).finalize())
-		actions.push_back(AIAction.new().set_type(AIAction.ALIGN_AND_RANGE).finalize())
-		#actions.push_back(AIAction.new().set_type(AIAction.APPROACH_AND_MELEE).finalize())
-		finalize()
+	func _init() -> void: pass
 	func finalize() -> AIProcessor:
 		process = type_to_callable()
 		for i in range(min_array_sizes().x): if actions.size() <= i: actions.push_back(AIAction.new().finalize())
+		for action in actions: action.finalize()
 		return self
 	func type_to_callable() -> Callable:
 		match self.type:
@@ -107,6 +123,22 @@ class AIFramework extends AIProcessor:
 		for i in range(actions.size()): 
 			if actions[i] is AIFramework: actions[i].calc_action_indexes()
 			elif actions[i] is AIAction: actions[i].calc_index()
+	static func generate_new() -> AIFramework:
+		var fw := AIFramework.new()
+		fw.type = randi_range(0, RANDOM)
+		
+		for i in randi_range(0, 3):
+			if randf() <= -0.4:
+				var naif := AIFramework.generate_new()
+				print("adding new fw to stack")
+				fw.actions.append(naif)
+			else:
+				var naia := AIAction.generate_new()
+				print("adding new ac to stack %s" % naia)
+				fw.actions.append(naia)
+				print("added %s" % fw.actions)
+		
+		return fw
 	
 #region Framework Type Methods
 	func deadweight() -> void: AIAction.DEADWEIGHT_ACTION.process.call()
@@ -125,6 +157,11 @@ class AIFramework extends AIProcessor:
 		if forced_lock_dir(): return
 		call_with_lock(randi() % actions.size())
 #endregion##########################################################################################
+	
+	func _to_string() -> String:
+		var sb := "[color=aqua]AIP<%s> Li: %s, Mi: %s[/color]" % [process.get_method(), l_index, m_index]
+		for action in actions: sb += "\n" + action.to_string()
+		return sb.trim_suffix("\n").replace("\n", "\n| ")
 
 class AIAction extends AIProcessor:
 	static var DEADWEIGHT_ACTION: AIAction = AIAction.new().set_type(DEADWEIGHT).finalize()
@@ -159,6 +196,11 @@ class AIAction extends AIProcessor:
 		m_index = AI.init_mem.size()
 		while init_mem.size() < min_memory_size(): init_mem.append(0.0)
 		if init_mem.size() > 0: AI.init_mem.append_array(init_mem)
+	
+	static func generate_new() -> AIAction:
+		var ac := AIAction.new()
+		ac.type = randi_range(0, ALIGN_AND_POUNCE)
+		return ac
 	
 	func basic_path_towards(x_dir: float, y_target: float):
 		AI.mas = true
@@ -213,6 +255,12 @@ class AIAction extends AIProcessor:
 				Vector2(0, 0.3)).normalized() * 0.03 * AI.entity.speed * sqrt(AI.target_distance)
 			attack.fire(AI, AI.target_vector)
 #endregion##########################################################################################
+
+	func _to_string() -> String:
+		var sb := "[color=#f90]AIA<%s> Mi: %s[/color]" % [process.get_method(), m_index]
+		if attack == null: return sb
+		for proj in attack.projectiles: sb += "\n\t[color=#b4f]" + proj.to_string() + "[/color]"
+		return sb
 
 class Attack:
 	var projectiles: Array[Projectile] = []
