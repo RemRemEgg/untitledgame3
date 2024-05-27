@@ -36,14 +36,15 @@ func _ready() -> void:
 func submit(text: String) -> void:
 	input.text = ""
 	parse_command(text)
+	h_index = -1
 	if (history.size() > 0 && history[0] != text) || history.size() == 0: history.push_front(text)
 
 func print(text: String) -> void:
-	print("[Console] " + text)
+	print_rich("[Console] " + text.replace("\n", "\n[Console] "))
 	lines.text += ("\n" if lines.text != "" else "") + text
 
 func print_err(text: String) -> void:
-	print("[Error] " + text)
+	print_rich("[Error] " + text.replace("\n", "\n[Error] "))
 	lines.text += ("\n" if lines.text != "" else "") + "[color=red]" + text + "[/color]"
 
 func parse_command(text: String) -> void:
@@ -61,8 +62,18 @@ func parse_command(text: String) -> void:
 			self.print(Entity.TEMP_CONST_PROCAI.to_string())
 		"error": self.print_err("error")
 		"sisl": self.print(":".join(args))
-		_:
-			print_err("Unknown Command '/%s'" % args[0])
+		"ai":
+			if args.size() < 2: return print_err("Not enough arguments for command")
+			match args[1]:
+				"tree": self.print(Entity.TEMP_CONST_PROCAI.to_string())
+				"rand":
+					Entity.TEMP_CONST_PROCAI = ProcAI.generate_new()
+					self.print(Entity.TEMP_CONST_PROCAI.to_string())
+				"build":
+					if args.size() < 3: return print_err("Not enough arguments for command")
+					Entity.TEMP_CONST_PROCAI = ProcAI.from_string(args[3])
+				_: print_err("Unknown Command '/%s'" % args[0])
+		_: print_err("Unknown Command '/%s'" % args[0])
 
 func split_in_same_level(text: String, blade: String) -> Array[String]:
 	if !text.contains(blade) || text.is_empty(): return [text]

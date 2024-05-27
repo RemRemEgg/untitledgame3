@@ -24,11 +24,7 @@ var terrain_active: bool = false   ###
 var readied: bool = false
 
 func _to_string() -> String:
-	var sbase := ""
-	match base_type:
-		bases.SWING: sbase = "SWING"
-		bases.ARROW: sbase = "Arrow"
-	var sb := "[%s] Mt: %s, p: %s, KNO: %s, col: %s%s%s" % [sbase, max_time, pierce, kill_no_origin,\
+	var sb := "Proj<%s> Mt: %s, p: %s, KNO: %s, col: %s%s%s" % [base.get_method(), max_time, pierce, kill_no_origin,\
 	friendly as int, hostile as int, terrain_active as int]
 	return sb
 

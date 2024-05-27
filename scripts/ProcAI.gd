@@ -26,6 +26,16 @@ func process(entity_: Entity) -> void:
 
 func update_target() -> void: entity.target = entity.get_tree().root.get_node("world/player") as Entity
 
+static func from_string(data: String) -> ProcAI:
+	var ai: ProcAI = ProcAI.new()
+	var rootfw := AIFramework.generate_new()
+	
+	AIFramework.AI = ai
+	AIAction.AI = ai
+	rootfw.finalize()
+	ai.processor = rootfw
+	return ai
+
 static func generate_new() -> ProcAI:
 	var ai: ProcAI = ProcAI.new()
 	
@@ -42,11 +52,9 @@ static func generate_new() -> ProcAI:
 	
 	var rootfw := AIFramework.generate_new()
 	
-	rootfw.finalize()
 	AIFramework.AI = ai
 	AIAction.AI = ai
-	rootfw.calc_index()
-	rootfw.calc_action_indexes()
+	rootfw.finalize()
 	
 	ai.processor = rootfw
 	
@@ -74,7 +82,6 @@ class AIProcessor:
 class AIFramework extends AIProcessor:
 	static var AI: ProcAI
 	enum {DEADWEIGHT, DISTANCE_2, CYCLE, RANDOM}
-	var init_mem: Array[float] = []
 	var type: int
 	var actions: Array[AIProcessor] = []
 	var l_index: int = -1
@@ -85,6 +92,11 @@ class AIFramework extends AIProcessor:
 		process = type_to_callable()
 		for i in range(min_array_sizes().x): if actions.size() <= i: actions.push_back(AIAction.new().finalize())
 		for action in actions: action.finalize()
+		calc_index()
+		calc_action_indexes()
+		match type:
+			DISTANCE_2:
+				AI.init_mem[m_index] = 100
 		return self
 	func type_to_callable() -> Callable:
 		match self.type:
@@ -115,12 +127,12 @@ class AIFramework extends AIProcessor:
 		AI.l_size += 1
 		m_index = AI.init_mem.size()
 		var mas := min_array_sizes()
-		while init_mem.size() < mas.y: init_mem.append(0.0)
-		if init_mem.size() > 0: AI.init_mem.append_array(init_mem)
-		for i in range(actions.size()): if actions[i] is AIFramework:
-			actions[i].calc_index()
+		for i in mas.y: AI.init_mem.append(0.0)
+		for i in actions.size():
+			if actions[i] is AIFramework:
+				actions[i].calc_index()
 	func calc_action_indexes() -> void:
-		for i in range(actions.size()): 
+		for i in actions.size(): 
 			if actions[i] is AIFramework: actions[i].calc_action_indexes()
 			elif actions[i] is AIAction: actions[i].calc_index()
 	static func generate_new() -> AIFramework:
@@ -128,19 +140,17 @@ class AIFramework extends AIProcessor:
 		fw.type = randi_range(0, RANDOM)
 		
 		for i in randi_range(0, 3):
-			if randf() <= -0.4:
+			if randf() <= 0.4:
 				var naif := AIFramework.generate_new()
-				print("adding new fw to stack")
 				fw.actions.append(naif)
 			else:
 				var naia := AIAction.generate_new()
-				print("adding new ac to stack %s" % naia)
 				fw.actions.append(naia)
-				print("added %s" % fw.actions)
 		
 		return fw
 	
-#region Framework Type Methods
+#regionFrameworkTypeMethods###################################################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	func deadweight() -> void: AIAction.DEADWEIGHT_ACTION.process.call()
 	
 	func distance_2() -> void:
@@ -156,8 +166,9 @@ class AIFramework extends AIProcessor:
 	func random() -> void:
 		if forced_lock_dir(): return
 		call_with_lock(randi() % actions.size())
-#endregion##########################################################################################
-	
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#endregion####################################################################################################################################################################################
+
 	func _to_string() -> String:
 		var sb := "[color=aqua]AIP<%s> Li: %s, Mi: %s[/color]" % [process.get_method(), l_index, m_index]
 		for action in actions: sb += "\n" + action.to_string()
@@ -210,7 +221,8 @@ class AIAction extends AIProcessor:
 		AI.entity.apply_gravity(1.0)
 		AI.entity.mem[m_index] = 1 if AI.entity.iof else 0
 	
-#region Action Type Methods
+#regionActionTypeMethods######################################################################################################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	func deadweight() -> void:
 		AI.mas = true
 		AI.entity.apply_friction()
@@ -254,7 +266,8 @@ class AIAction extends AIProcessor:
 			AI.entity.velocity = ((AI.entity.target.get_feet_pos() - AI.entity.get_feet_pos()).normalized() -
 				Vector2(0, 0.3)).normalized() * 0.03 * AI.entity.speed * sqrt(AI.target_distance)
 			attack.fire(AI, AI.target_vector)
-#endregion##########################################################################################
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#endregion####################################################################################################################################################################################
 
 	func _to_string() -> String:
 		var sb := "[color=#f90]AIA<%s> Mi: %s[/color]" % [process.get_method(), m_index]
