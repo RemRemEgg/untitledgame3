@@ -45,7 +45,7 @@ func _process(delta: float) -> void:
 	else: apply_friction()
 	apply_gravity(1.0 + (0.3 if velocity.y > 0 else (!Input.is_action_pressed("jump") as float)))
 	
-	if jump_mem > 0.0 && cyote > 0.0:
+	if jump_mem > 0.0:# && cyote > 0.0:
 		cyote = -100.0
 		jump_mem = -100.0
 		jump(input_dir * 0.25)

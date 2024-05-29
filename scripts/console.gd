@@ -12,12 +12,12 @@ func _input(event: InputEvent) -> void:
 		if event.is_action("dbg_console"): call_deferred("toggle")
 		if event.keycode == KEY_UP:
 			h_index = clamp(h_index +1, -1, history.size() -1)
-			if h_index != -1: input.text = history[h_index]
-			else: input.text = ""
+			input.text = ""
+			if h_index != -1: input.insert_text_at_caret(history[h_index])
 		if event.keycode == KEY_DOWN:
 			h_index = clamp(h_index -1, -1, history.size() -1)
-			if h_index != -1: input.text = history[h_index]
-			else: input.text = ""
+			input.text = ""
+			if h_index != -1: input.insert_text_at_caret(history[h_index])
 
 func toggle() -> void:
 	active = !active
@@ -50,18 +50,9 @@ func print_err(text: String) -> void:
 func parse_command(text: String) -> void:
 	var args: Array[String] = split_in_same_level(text, " ")
 	
-	if !args[0].begins_with("/"):
-		self.print(text)
-		return
-	args[0] = args[0].substr(1)
-	
 	match args[0]:
 		"clear": clear()
-		"tree":
-			Entity.TEMP_CONST_PROCAI = ProcAI.generate_new()
-			self.print(Entity.TEMP_CONST_PROCAI.to_string())
-		"error": self.print_err("error")
-		"sisl": self.print(":".join(args))
+		"say": self.print(" ".join(args.slice(1)))
 		"ai":
 			if args.size() < 2: return print_err("Not enough arguments for command")
 			match args[1]:
@@ -69,9 +60,11 @@ func parse_command(text: String) -> void:
 				"rand":
 					Entity.TEMP_CONST_PROCAI = ProcAI.generate_new()
 					self.print(Entity.TEMP_CONST_PROCAI.to_string())
-				"build":
+				"seed":
 					if args.size() < 3: return print_err("Not enough arguments for command")
-					Entity.TEMP_CONST_PROCAI = ProcAI.from_string(args[3])
+					seed(args[2].hash())
+					Entity.TEMP_CONST_PROCAI = ProcAI.generate_new()
+					self.print(Entity.TEMP_CONST_PROCAI.to_string())
 				_: print_err("Unknown Command '/%s'" % args[0])
 		_: print_err("Unknown Command '/%s'" % args[0])
 
