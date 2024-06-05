@@ -136,7 +136,7 @@ func arrow_initalizer() -> void:
 	transform = origin.global_transform
 func arrow() -> void:
 	apply_gravity((time/max_time + 0.5)**2)
-	apply_friction()
 	move_and_slide()
+	if iof: velocity = velocity.move_toward(Vector2.ZERO, idelta*32)
 
 #endregion##########################################################################################

@@ -10,7 +10,7 @@ var target_vector: Vector2 = Vector2(0, 0)
 
 class MOVE_TYPE: enum {LAND, AIR, GROUND, ALL, STATIC}
 const move_names := ["land", "air", "ground", "all", "static"]
-var move_type: int = MOVE_TYPE.ALL
+var move_type: int = MOVE_TYPE.LAND
 
 func process(entity_: Entity) -> void:
 	entity = entity_
@@ -84,7 +84,7 @@ class AIFramework extends AIProcessor:
 	func _init() -> void: pass
 	func finalize() -> AIProcessor:
 		process = type_to_callable()
-		for i in range(min_array_sizes().x): if actions.size() <= i: actions.push_back(AIAction.new().finalize())
+		for i in range(min_array_sizes().x): if actions.size() <= i: actions.push_back(AIAction.generate_new().finalize())
 		for action in actions: action.finalize()
 		calc_index()
 		calc_action_indexes()
@@ -131,7 +131,7 @@ class AIFramework extends AIProcessor:
 			elif actions[i] is AIAction: actions[i].calc_index()
 	static func generate_new() -> AIFramework:
 		var fw := AIFramework.new()
-		fw.type = randi_range(0, RANDOM)
+		fw.type = randi_range(DISTANCE_2, RANDOM)
 		
 		for i in randi_range(0, 3):
 			if randf() <= 0.4:
@@ -205,7 +205,7 @@ class AIAction extends AIProcessor:
 	
 	static func generate_new() -> AIAction:
 		var ac := AIAction.new()
-		ac.type = randi_range(0, ALIGN_AND_POUNCE)
+		ac.type = randi_range(APPROACH_AND_MELEE, ALIGN_AND_POUNCE)
 		return ac
 	
 	func movement_branch(x_dir: float, y_dir: int) -> void:
@@ -221,7 +221,6 @@ class AIAction extends AIProcessor:
 		#if !AI.entity.iof && AI.entity.mem[m_index] == 1 && y_target <= AI.entity.global_position.y + 8 && AI.entity.velocity.y > 0: AI.entity.jump(x_dir)
 		AI.entity.xccelerate(x_dir)
 		AI.entity.apply_gravity(1.0)
-		AI.entity.apply_friction()
 		AI.entity.mem[m_index] = 1 if AI.entity.iof else 0
 	
 	func all_mover(x_dir: float, y_dir: float) -> void:
@@ -260,7 +259,7 @@ class AIAction extends AIProcessor:
 	
 	func align_and_pounce() -> void:
 		if AI.entity.is_attack_locked: mover.call(0, 0)
-		elif (AI.target_distance < 130**2 || AI.target_distance > 140**2) || !AI.entity.iof:
+		elif (AI.target_distance < 130**2 || AI.target_distance > 140**2):
 			mover.call(sign(AI.target_distance-135**2) * sign(AI.target_vector.x), sign(AI.target_vector.y))
 			if AI.entity.lock_timer <= 0.0: AI.entity.lock_timer = 180
 		else:

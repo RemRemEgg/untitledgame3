@@ -10,10 +10,11 @@ var acceleration: float = 24
 var gravity: Vector2 = Vector2(0.0, 15.0)
 
 func apply_gravity(mult: float) -> void: velocity += gravity * idelta * mult
-func xccelerate(direction: float) -> void: velocity = velocity.move_toward(Vector2(direction * speed * idelta, velocity.y), acceleration)
-func yccelerate(direction: float) -> void: velocity = velocity.move_toward(Vector2(velocity.x, direction * speed * idelta), acceleration)
-func xyccelerate(dx: float, dy: float) -> void: velocity = velocity.move_toward(Vector2(dx * speed * idelta, dy * speed * idelta), acceleration)
-func apply_friction() -> void: velocity = velocity.move_toward(Vector2(0.0, velocity.y), (friction if iof else air_friction) * speed * (1 + idelta))
+func xccelerate(direction: float) -> void: velocity = velocity.move_toward(Vector2(direction * speed, velocity.y), acceleration * idelta)
+func yccelerate(direction: float) -> void: velocity = velocity.move_toward(Vector2(velocity.x, direction * speed), acceleration * idelta)
+func xyccelerate(dx: float, dy: float) -> void: velocity = velocity.move_toward(Vector2(dx * speed, dy * speed), acceleration * idelta)
+func xyvccelerate(dir: Vector2) -> void: velocity = velocity.move_toward(Vector2(dir.x * speed, dir.y * speed), acceleration * idelta)
+func __apply_friction() -> void: velocity = velocity.move_toward(Vector2(0.0, velocity.y), (friction if iof else air_friction) * speed * idelta)
 
 var friendly: bool = true
 var hostile: bool = true

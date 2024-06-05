@@ -42,7 +42,7 @@ func _process(delta: float) -> void:
 	if input_dir:
 		sprite.flip_h = input_dir < 0
 		xccelerate(sign(input_dir))
-	else: apply_friction()
+	else: xccelerate(0)
 	apply_gravity(1.0 + (0.3 if velocity.y > 0 else (!Input.is_action_pressed("jump") as float)))
 	
 	if jump_mem > 0.0:# && cyote > 0.0:
@@ -67,7 +67,7 @@ func _input(event: InputEvent) -> void:
 			1 when event.pressed && weapons[0]: use_item(weapons[0])
 			2 when event.pressed && weapons[1]: use_item(weapons[1])
 			3 when event.pressed:
-				Engine.max_fps = 20
+				Engine.max_fps = (120 if Engine.max_fps == 16 else 16)
 			4 when event.pressed:
 				for i in range(1):
 					var dummy: Entity = (load("res://scenes/world/entity.tscn") as PackedScene).instantiate() as Entity
