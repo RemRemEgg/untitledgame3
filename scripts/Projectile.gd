@@ -93,6 +93,7 @@ func _process(delta) -> void:
 func _physics_process(_delta) -> void: pass
 
 func collide_with_body(body_rid: RID, body: Node2D, _bsi: int, _lsi: int) -> void:
+	if hitbox.collision_mask == 0: return
 	var has_origin := is_instance_valid(origin)
 	if kill_no_origin && !has_origin: return kill()
 	if has_origin && origin.get_rid() == body_rid: return
@@ -104,7 +105,10 @@ func generate_damage_event() -> DamageEvent:
 	var dmg: DamageEvent = DamageEvent.create(10)
 	return dmg
 
-func kill() -> void: queue_free()
+func kill() -> void:
+	queue_free()
+	hitbox.collision_mask = 0x0
+	hitbox.collision_layer = 0x0
 
 class bases: enum {SWING, ARROW}
 func base_to_callable() -> Callable:

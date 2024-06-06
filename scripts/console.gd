@@ -53,19 +53,35 @@ func parse_command(text: String) -> void:
 	match args[0]:
 		"clear": clear()
 		"say": self.print(" ".join(args.slice(1)))
+		"fps":
+			if args.size() < 2: return self.print("Current FPS target is %s (%s mspt), running at %s" % [Engine.max_fps,round(1000/Engine.max_fps),Engine.get_frames_per_second()])
+			Engine.max_fps = int(args[1])
+			self.print("FPS target set to %s (%s mspt), running at %s" % [Engine.max_fps,round(1000/Engine.max_fps),Engine.get_frames_per_second()])
+			pass
 		"ai":
 			if args.size() < 2: return print_err("Not enough arguments for command")
 			match args[1]:
 				"tree": self.print(Entity.TEMP_CONST_PROCAI.to_string())
 				"rand":
-					Entity.TEMP_CONST_PROCAI = ProcAI.generate_new()
-					self.print(Entity.TEMP_CONST_PROCAI.to_string())
+					if args.size() < 3: return self.print("Entity AI randomization is %s" % Entity.RAND)
+					Entity.RAND = args[2].to_lower() == "true"
+					self.print("Entity AI randomization set to %s" % Entity.RAND)
 				"seed":
 					if args.size() < 3: return print_err("Not enough arguments for command")
 					seed(args[2].hash())
 					Entity.TEMP_CONST_PROCAI = ProcAI.generate_new()
 					self.print(Entity.TEMP_CONST_PROCAI.to_string())
-				_: print_err("Unknown Command '/%s'" % args[0])
+				"root":
+					if args.size() < 3: return print_err("Not enough arguments for command")
+					match args[2]:
+						"type":
+							if args.size() < 4: return print_err("Not enough arguments for command")
+							Entity.TEMP_CONST_PROCAI.move_type = int(args[3])
+				"type":
+					if args.size() < 3: return print_err("Not enough arguments for command")
+					Global.TEMP.FORCE_AI_TYPE = int(args[2])
+					self.print("Force AI type set to %s" % ProcAI.move_names[Global.TEMP.FORCE_AI_TYPE])
+				_: print_err("Unknown Command '/%s'" % args[1])
 		_: print_err("Unknown Command '/%s'" % args[0])
 
 func split_in_same_level(text: String, blade: String) -> Array[String]:

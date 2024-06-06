@@ -19,7 +19,7 @@ func _ready() -> void:
 	speed = 240.0
 	acceleration = 36
 	gravity = Vector2(0.0, 15.0)
-	jump_power = 260.0
+	jump_power = 320.0
 	health = 10000000.0
 	max_health = health
 	friendly = true
@@ -66,8 +66,7 @@ func _input(event: InputEvent) -> void:
 			# TODO weaponry
 			1 when event.pressed && weapons[0]: use_item(weapons[0])
 			2 when event.pressed && weapons[1]: use_item(weapons[1])
-			3 when event.pressed:
-				Engine.max_fps = (120 if Engine.max_fps == 16 else 16)
+			3 when event.pressed: pass
 			4 when event.pressed:
 				for i in range(1):
 					var dummy: Entity = (load("res://scenes/world/entity.tscn") as PackedScene).instantiate() as Entity

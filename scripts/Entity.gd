@@ -17,9 +17,11 @@ var jump_power: float = 256.0
 
 var lhurt_pop: TextPopup
 
-static var TEMP_CONST_PROCAI = ProcAI.generate_new()
+static var TEMP_CONST_PROCAI := ProcAI.generate_new()
+static var RAND := true
 
 func _ready() -> void:
+	if RAND: TEMP_CONST_PROCAI = ProcAI.generate_new()
 	TEMP_CONST_PROCAI.register_entity(self)
 	update_collision_layers()
 
