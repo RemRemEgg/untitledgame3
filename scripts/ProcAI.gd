@@ -11,7 +11,7 @@ var target_foot_vector: Vector2 = Vector2(0, 0)
 
 class MOVE_TYPE: enum {LAND, AIR, GROUND, ALL, STATIC}
 const move_names := ["land", "air", "ground", "all", "static"]
-var move_type: int = Global.TEMP.FORCE_AI_TYPE
+var move_type: int = 0
 
 func process(entity_: Entity) -> void:
 	entity = entity_
@@ -30,17 +30,7 @@ func update_target() -> void: entity.target = entity.get_tree().root.get_node("w
 
 static func generate_new() -> ProcAI:
 	var ai: ProcAI = ProcAI.new()
-	
-	#var sub := AIFramework.new()
-	#sub.type = AIFramework.DISTANCE_2
-	#sub.actions.push_back(AIAction.new().set_type(AIAction.ALIGN_AND_RANGE).finalize())
-	#sub.actions.push_back(AIAction.new().set_type(AIAction.APPROACH_AND_MELEE).finalize())
-	#
-	#var rootfw: AIFramework = AIFramework.new()
-	#
-	#rootfw.type = AIFramework.CYCLE
-	#rootfw.actions.push_back(sub.finalize())
-	#rootfw.actions.push_back(AIAction.new().set_type(AIAction.ALIGN_AND_POUNCE).finalize())
+	ai.move_type = Global.TEMP.FORCE_AI_TYPE if Global.TEMP.FORCE_AI_TYPE != -1 else randi_range(MOVE_TYPE.LAND, MOVE_TYPE.ALL)
 	
 	var rootfw := AIFramework.generate_new()
 	
@@ -60,9 +50,11 @@ func register_entity(ent: Entity):
 	ent.locks.fill(0)
 	ent.mem = init_mem.duplicate()
 	
+	ent.sprite.texture = ItemData.load_texture("res://assets/textures/mobs/type_%s.png" % move_names[move_type])
+	
 	ent.collision_layer = Global.COLLISION.HOSTILE_ENT
 	match move_type:
-		MOVE_TYPE.AIR, MOVE_TYPE.GROUND, MOVE_TYPE.ALL: ent.terrain = false
+		MOVE_TYPE.GROUND, MOVE_TYPE.ALL: ent.terrain = false
 
 func _to_string() -> String:
 	var sb := "[color=#aea]ProcAI<%s> iM: %s[/color]" % [move_names[move_type], init_mem]
@@ -221,7 +213,10 @@ class AIAction extends AIProcessor:
 	func movement_branch(x_dir: float, y_dir: int) -> void:
 		match AI.move_type:
 			MOVE_TYPE.LAND: mover = land_mover
+			MOVE_TYPE.AIR: mover = air_mover
+			MOVE_TYPE.GROUND: mover = ground_mover
 			MOVE_TYPE.ALL: mover = all_mover
+			MOVE_TYPE.STATIC: mover = static_mover
 			_: return
 		mover.call(x_dir, y_dir)
 	
@@ -233,12 +228,41 @@ class AIAction extends AIProcessor:
 		AI.entity.apply_gravity(1.0)
 		AI.entity.mem[m_index] = 1 if AI.entity.iof else 0
 	
+	func air_mover(x_dir: float, y_dir: float) -> void:
+		AI.mas = true
+		AI.entity.xyccelerate(x_dir, y_dir)
+		var t := randf_range(-1.05, 1.05)
+		AI.entity.mem[m_index] += t ** 30
+		if x_dir == 0 && y_dir == 0: AI.entity.xyvccelerate(Vector2.RIGHT.rotated(AI.entity.mem[m_index]))
+	
+	func ground_mover(x_dir: float, y_dir: float) -> void:
+		AI.mas = true
+		var pp := PhysicsPointQueryParameters2D.new()
+		pp.collision_mask = Global.COLLISION.WORLD
+		pp.position = AI.entity.global_position
+		if AI.entity.get_world_2d().direct_space_state.intersect_point(pp, 1):
+			AI.entity.sprite.modulate = Color(0, 1, 0)
+			var d := Vector2(x_dir, y_dir) * 5 + AI.entity.velocity
+			AI.entity.xyvccelerate(d.normalized() * 1.4)
+		else:
+			AI.entity.sprite.modulate = Color(1, 0, 0)
+			#AI.entity.xyccelerate(0, 0)
+			AI.entity.apply_gravity(0.2)
+		#var c := AI.entity.velocity
+		#var a := c.angle()
+		#var b := d.angle()
+		#var r := (a + b) / 2
+		#var v := Vector2.RIGHT.rotated(r) * d.length()
+		#AI.entity.xyccelerate(v.x, v.y)
+	
 	func all_mover(x_dir: float, y_dir: float) -> void:
 		AI.mas = true
 		AI.entity.xyccelerate(x_dir, y_dir)
 		var t := randf_range(-1.05, 1.05)
 		AI.entity.mem[m_index] += t ** 30
 		if x_dir == 0 && y_dir == 0: AI.entity.xyvccelerate(Vector2.RIGHT.rotated(AI.entity.mem[m_index]))
+	
+	func static_mover(x_dir: float, y_dir: float) -> void: pass
 	
 #regionActionTypeMethods######################################################################################################################################################################
 ##############################################################################################################################################################################################

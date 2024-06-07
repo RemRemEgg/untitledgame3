@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://rk4ud8rrxhbd"]
 
 [ext_resource type="Script" path="res://scripts/Entity.gd" id="1_u2m8v"]
-[ext_resource type="Texture2D" uid="uid://hfrkmprrjalp" path="res://assets/textures/mobs/golemn.png" id="2_dmp48"]
+[ext_resource type="Texture2D" uid="uid://hfrkmprrjalp" path="res://assets/textures/mobs/type_land.png" id="2_dmp48"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_e2kva"]
 size = Vector2(12, 22)

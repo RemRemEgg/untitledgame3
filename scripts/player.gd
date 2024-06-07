@@ -1,7 +1,6 @@
 class_name Player
 extends Entity
 
-@onready var sprite: Sprite2D = $sprite
 @onready var camera: Camera2D = $camera
 	
 var dash := [0.0, Vector2.ZERO]

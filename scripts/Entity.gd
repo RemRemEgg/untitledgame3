@@ -2,6 +2,7 @@ class_name Entity
 extends CustomPhysicsObject
 
 @onready var collider: CollisionShape2D = $collider
+@onready var sprite: Sprite2D = $sprite
 
 var proc_ai: ProcAI
 var lock_timer: float = 0.0
@@ -17,7 +18,7 @@ var jump_power: float = 256.0
 
 var lhurt_pop: TextPopup
 
-static var TEMP_CONST_PROCAI := ProcAI.generate_new()
+static var TEMP_CONST_PROCAI: ProcAI
 static var RAND := true
 
 func _ready() -> void:

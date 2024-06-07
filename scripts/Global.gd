@@ -23,4 +23,4 @@ class COLLISION:
 	static var FRIENDLY_PROJ: int = FRIENDLY_ENT << 4
 
 class TEMP:
-	static var FORCE_AI_TYPE: int = 0
+	static var FORCE_AI_TYPE: int = -1

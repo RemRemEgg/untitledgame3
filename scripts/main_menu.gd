@@ -19,6 +19,7 @@ func load_game() -> void:
 	ItemData.register_all()
 	await get_tree().create_timer(0).timeout
 	$loading/loading_text.visible = false
+	Entity.TEMP_CONST_PROCAI = ProcAI.generate_new()
 	finish_loading()
 
 # TODO setup savefiles

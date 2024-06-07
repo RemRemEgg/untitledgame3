@@ -13,7 +13,7 @@ func apply_gravity(mult: float) -> void: velocity += gravity * idelta * mult
 func xccelerate(direction: float) -> void: velocity = velocity.move_toward(Vector2(direction * speed, velocity.y), acceleration * idelta)
 func yccelerate(direction: float) -> void: velocity = velocity.move_toward(Vector2(velocity.x, direction * speed), acceleration * idelta)
 func xyccelerate(dx: float, dy: float) -> void: velocity = velocity.move_toward(Vector2(dx * speed, dy * speed), acceleration * idelta)
-func xyvccelerate(dir: Vector2) -> void: velocity = velocity.move_toward(Vector2(dir.x * speed, dir.y * speed), acceleration * idelta)
+func xyvccelerate(dir: Vector2) -> void: velocity = velocity.move_toward(dir * speed, acceleration * idelta)
 func __apply_friction() -> void: velocity = velocity.move_toward(Vector2(0.0, velocity.y), (friction if iof else air_friction) * speed * idelta)
 
 var friendly: bool = true
