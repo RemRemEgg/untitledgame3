@@ -1,11 +1,12 @@
 extends Control
 
-@onready var loading = $loading
-@onready var curtain = $loading/curtain
+@onready var loading: Control = $loading as Control
+@onready var loading_text: TextureRect = $loading/loading_text as TextureRect
+@onready var curtain: ColorRect = $loading/curtain as ColorRect
 
 func _ready() -> void:
 	Engine.max_fps = 60
-	$loading.visible = true
+	loading.visible = true
 	call_deferred("load_game")
 
 func finish_loading() -> void:
@@ -18,7 +19,7 @@ func finish_loading() -> void:
 func load_game() -> void:
 	ItemData.register_all()
 	await get_tree().create_timer(0).timeout
-	$loading/loading_text.visible = false
+	loading_text.visible = false
 	Entity.TEMP_CONST_PROCAI = ProcAI.generate_new()
 	finish_loading()
 

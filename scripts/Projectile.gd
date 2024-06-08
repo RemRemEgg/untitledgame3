@@ -4,10 +4,10 @@ extends CustomPhysicsObject
 static var SCENE: PackedScene = preload("res://scenes/world/projectile.tscn")
 func none() -> void: pass
 
-@onready var collider: CollisionShape2D = $collider
-@onready var sprite: Sprite2D = $sprite
-@onready var hitbox: Area2D = $hitbox
-@onready var hitbox_collider: CollisionShape2D = $hitbox/collider
+@onready var collider: CollisionShape2D = $collider as CollisionShape2D
+@onready var sprite: Sprite2D = $sprite as Sprite2D
+@onready var hitbox: Area2D = $hitbox as Area2D
+@onready var hitbox_collider: CollisionShape2D = $hitbox/collider as CollisionShape2D
 
 var initalizer: Callable = kill
 var base: Callable = kill
@@ -49,7 +49,8 @@ func solidify_from(other: Projectile) -> void:
 	base_type = other.base_type
 	base = base_to_callable()
 	initalizer = base_to_init_callable()
-	mem = other.mem.duplicate()
+	mem.resize(0)
+	mem.append_array(other.mem)
 	texture = other.texture
 	
 	time = other.time
@@ -81,7 +82,7 @@ func _ready() -> void:
 		hitbox_collider.shape = collider.shape
 		hitbox.body_shape_entered.connect(collide_with_body)
 
-func _process(delta) -> void:
+func _process(delta: float) -> void:
 	delta *= 60
 	time += delta
 	if time >= max_time: return kill()
@@ -90,14 +91,14 @@ func _process(delta) -> void:
 	if terrain_active: iof = is_on_floor()
 	base.call()
 
-func _physics_process(_delta) -> void: pass
+func _physics_process(_delta: float) -> void: pass
 
 func collide_with_body(body_rid: RID, body: Node2D, _bsi: int, _lsi: int) -> void:
 	if hitbox.collision_mask == 0: return
 	var has_origin := is_instance_valid(origin)
 	if kill_no_origin && !has_origin: return kill()
 	if has_origin && origin.get_rid() == body_rid: return
-	if body is Entity: body.take_damage(generate_damage_event())
+	if body is Entity: (body as Entity).take_damage(generate_damage_event())
 	pierce -= 1
 	if pierce == -1: kill()
 

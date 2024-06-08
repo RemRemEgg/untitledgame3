@@ -3,8 +3,8 @@ extends Control
 
 static var SCENE: PackedScene = preload("res://scenes/ui/text_popup.tscn")
 # TODO make text popups look better
-@onready var txt: Label = $text
-@onready var anim: AnimationPlayer = $anim
+@onready var txt: Label = $text as Label
+@onready var anim: AnimationPlayer = $anim as AnimationPlayer
 var velocity: Vector2 = Vector2(randf() * 1.5 - 0.75, -(randf() * 0.3 + 0.5)) * 96
 
 var text: String :
@@ -14,7 +14,7 @@ var text: String :
 
 static func create(val: String) -> TextPopup:
 	var txtpop := SCENE.instantiate() as TextPopup
-	txtpop.txt = txtpop.get_node("text")
+	txtpop.txt = txtpop.get_node("text") as Label
 	txtpop.text = val
 	return txtpop
 

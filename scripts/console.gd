@@ -1,7 +1,7 @@
 extends CanvasLayer
 
-@onready var lines: RichTextLabel = $margin/vbox/lines
-@onready var input: LineEdit = $margin/vbox/input
+@onready var lines: RichTextLabel = $margin/vbox/lines as RichTextLabel
+@onready var input: LineEdit = $margin/vbox/input as LineEdit
 
 var active: bool = false
 var history: Array[String] = []
@@ -81,8 +81,16 @@ func parse_command(text: String) -> void:
 					if args.size() < 3: return print_err("Not enough arguments for command")
 					Global.TEMP.FORCE_AI_TYPE = int(args[2])
 					self.print("Force AI type set to %s" % ProcAI.move_names[Global.TEMP.FORCE_AI_TYPE])
-				_: print_err("Unknown Command '/%s'" % args[1])
-		_: print_err("Unknown Command '/%s'" % args[0])
+				_: print_err("Unknown Command '%s'" % args[1])
+		"eval":
+			var exp: Expression = Expression.new()
+			exp.parse(" ".join(args.slice(1)))
+			self.print(str(exp.execute()))
+		"test":
+			var i := 0
+			i -= 1024
+			self.print(str(i >> 8))
+		_: print_err("Unknown Command '%s'" % args[0])
 
 func split_in_same_level(text: String, blade: String) -> Array[String]:
 	if !text.contains(blade) || text.is_empty(): return [text]

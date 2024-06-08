@@ -1,9 +1,10 @@
 class_name Player
 extends Entity
 
-@onready var camera: Camera2D = $camera
+@onready var camera: Camera2D = $camera as Camera2D
 	
-var dash := [0.0, Vector2.ZERO]
+var dash_time: float = 0.0
+var dash_dir: Vector2 = Vector2.ZERO
 var dash_power: float = 3.2
 var cyote: float = 0.0;
 var jump_mem: float = 0.0
@@ -19,12 +20,17 @@ func _ready() -> void:
 	acceleration = 36
 	gravity = Vector2(0.0, 15.0)
 	jump_power = 320.0
-	health = 10000000.0
+	health = 10.0
 	max_health = health
 	friendly = true
 	hostile = false
 	collision_layer = Global.COLLISION.FRIENDLY_ENT
 	collision_mask = Global.COLLISION.WORLD
+
+func die() -> void:
+	0
+	0
+	0
 
 func _process(delta: float) -> void:
 	idelta = delta * 60.0
@@ -32,7 +38,7 @@ func _process(delta: float) -> void:
 	jump_mem -= idelta
 	cyote -= idelta
 	if iof: cyote = 5
-	dash[0] += idelta
+	dash_time += idelta
 	if using_time > 0.0:
 		using_time -= idelta
 		if using_time <= 0.0: done_using()
@@ -40,7 +46,7 @@ func _process(delta: float) -> void:
 	var input_dir: float = Input.get_axis("left", "right")
 	if input_dir:
 		sprite.flip_h = input_dir < 0
-		xccelerate(sign(input_dir))
+		xccelerate(Global.fsign(input_dir))
 	else: xccelerate(0)
 	apply_gravity(1.0 + (0.3 if velocity.y > 0 else (!Input.is_action_pressed("jump") as float)))
 	
@@ -49,24 +55,26 @@ func _process(delta: float) -> void:
 		jump_mem = -100.0
 		jump(input_dir * 0.25)
 	
-	if dash[0] < -30: velocity = dash[1]
+	if dash_time < -30: velocity = dash_dir
 	move_and_slide()
-	if dash[0] < -30: velocity = dash[1] / dash_power
+	if dash_time < -30: velocity = dash_dir / dash_power
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey:
 		if Input.is_action_just_pressed("jump"): jump_mem = 10
-		if Input.is_action_just_pressed("dash") && dash[0] >= 0.0:
+		if Input.is_action_just_pressed("dash") && dash_time >= 0.0:
 			var dir := Input.get_vector("left", "right", "up", "down")
 			if !dir: dir = Vector2(-1.0 if sprite.flip_h else 1.0, 0.0);
-			dash = [-33, dir * speed * dash_power]
+			dash_time = -33
+			dash_dir = dir * speed * dash_power
 	if event is InputEventMouseButton:
-		match event.button_index:
+		var eiemb: InputEventMouseButton = event as InputEventMouseButton
+		match eiemb.button_index:
 			# TODO weaponry
-			1 when event.pressed && weapons[0]: use_item(weapons[0])
-			2 when event.pressed && weapons[1]: use_item(weapons[1])
-			3 when event.pressed: pass
-			4 when event.pressed:
+			1 when eiemb.pressed && weapons[0]: use_item(weapons[0])
+			2 when eiemb.pressed && weapons[1]: use_item(weapons[1])
+			3 when eiemb.pressed: pass
+			4 when eiemb.pressed:
 				for i in range(1):
 					var dummy: Entity = (load("res://scenes/world/entity.tscn") as PackedScene).instantiate() as Entity
 					dummy.global_transform.origin = get_global_mouse_position()
