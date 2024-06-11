@@ -43,7 +43,7 @@ func add_to_world() -> void:
 	var parent: Node = get_parent()
 	if parent: parent.remove_child(self)
 	sprite.texture = texture
-	Global.WORLD_PROJECTILES.add_child(self)
+	Global.WORLD.PROJECTILES.add_child(self)
 
 func solidify_from(other: Projectile) -> void:
 	base_type = other.base_type

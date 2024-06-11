@@ -1,5 +1,6 @@
-[gd_scene load_steps=8 format=3 uid="uid://bkb344rfhejjb"]
+[gd_scene load_steps=9 format=3 uid="uid://bkb344rfhejjb"]
 
+[ext_resource type="Script" path="res://scripts/hud.gd" id="1_5j0mf"]
 [ext_resource type="Texture2D" uid="uid://bfppsujvb7qhi" path="res://assets/textures/ui/button.png" id="1_fjc1b"]
 [ext_resource type="Texture2D" uid="uid://b0moijdpb8wx7" path="res://assets/textures/item/sword.png" id="2_7kwf8"]
 [ext_resource type="Texture2D" uid="uid://8sje2lcktqnj" path="res://assets/textures/item/rock.png" id="3_k0vbg"]
@@ -15,6 +16,7 @@ bg_color = Color(0.678431, 0, 0.156863, 1)
 bg_color = Color(0, 0.6, 0.678431, 1)
 
 [node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_5j0mf")
 
 [node name="margin" type="MarginContainer" parent="."]
 anchors_preset = 15
@@ -116,21 +118,20 @@ grow_horizontal = 0
 [node name="v_box_container" type="VBoxContainer" parent="margin/stats/h_box_container"]
 layout_mode = 2
 
-[node name="progress_bar" type="ProgressBar" parent="margin/stats/h_box_container/v_box_container"]
+[node name="health_bar" type="ProgressBar" parent="margin/stats/h_box_container/v_box_container"]
 custom_minimum_size = Vector2(64, 8)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_xywh0")
 theme_override_styles/fill = SubResource("StyleBoxFlat_muhi2")
-value = 80.0
 fill_mode = 1
 show_percentage = false
 
-[node name="progress_bar2" type="ProgressBar" parent="margin/stats/h_box_container/v_box_container"]
+[node name="unknown" type="ProgressBar" parent="margin/stats/h_box_container/v_box_container"]
 custom_minimum_size = Vector2(64, 8)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_xywh0")
 theme_override_styles/fill = SubResource("StyleBoxFlat_485wc")
-value = 35.0
+value = 100.0
 fill_mode = 1
 show_percentage = false
 

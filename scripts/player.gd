@@ -1,8 +1,11 @@
 class_name Player
 extends Entity
 
+static var DEATH_SCREEN := preload("res://scenes/ui/death_screen.tscn")
+
 @onready var camera: Camera2D = $camera as Camera2D
-	
+@onready var hud: HUD = $camera/HUD as HUD
+
 var dash_time: float = 0.0
 var dash_dir: Vector2 = Vector2.ZERO
 var dash_power: float = 3.2
@@ -20,7 +23,7 @@ func _ready() -> void:
 	acceleration = 36
 	gravity = Vector2(0.0, 15.0)
 	jump_power = 320.0
-	health = 10.0
+	health = 100.0
 	max_health = health
 	friendly = true
 	hostile = false
@@ -28,11 +31,37 @@ func _ready() -> void:
 	collision_mask = Global.COLLISION.WORLD
 
 func die() -> void:
-	0
-	0
-	0
+	death_time = 1
+	collision_layer = 0x0
+	collision_mask = 0x0
+	velocity /= 80.0
+	var ds: Node = DEATH_SCREEN.instantiate()
+	camera.add_child(ds)
+
+func death() -> void:
+	var v: float = 0.5 / death_time
+	sprite.self_modulate = Color(v, v, v, v)
+	velocity *= 0.96
+	global_position += velocity
+	death_time += idelta
+	if death_time > 90:
+		for pds in camera.get_children():
+			if pds.get_meta("death_screen", false):
+				camera.remove_child(pds)
+				pds.queue_free()
+		respawn()
+
+func respawn() -> void:
+	death_time = 0.0
+	update_collision_layers()
+	health = max_health
+	velocity = Vector2.ZERO
+	sprite.self_modulate = Color.WHITE
+	global_position = Vector2.ZERO
 
 func _process(delta: float) -> void:
+	hud.update(self)
+	if death_time > 0.0: return death()
 	idelta = delta * 60.0
 	iof = is_on_floor()
 	jump_mem -= idelta
@@ -58,6 +87,10 @@ func _process(delta: float) -> void:
 	if dash_time < -30: velocity = dash_dir
 	move_and_slide()
 	if dash_time < -30: velocity = dash_dir / dash_power
+	
+	hurt_time -= idelta
+	sprite.self_modulate = Color.WHITE
+	if hurt_time > 0: sprite.self_modulate = Color.PALE_VIOLET_RED
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey:

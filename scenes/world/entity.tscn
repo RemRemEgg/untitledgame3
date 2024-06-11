@@ -6,7 +6,7 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_e2kva"]
 size = Vector2(12, 22)
 
-[node name="Entity" type="CharacterBody2D"]
+[node name="Entity" type="CharacterBody2D" groups=["entities"]]
 process_priority = 50
 process_physics_priority = 50
 collision_layer = 0

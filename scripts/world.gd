@@ -4,6 +4,8 @@ extends Node2D
 @onready var camera: Camera2D = $player/camera as Camera2D
 @onready var background: Sprite2D = $background as Sprite2D
 
+@onready var PROJECTILES: Node2D = $projectiles as Node2D
+
 func _ready() -> void: pass
 
 func _enter_tree() -> void:
@@ -11,7 +13,7 @@ func _enter_tree() -> void:
 		Global.PLAYER.transform.origin = Vector2.ZERO
 		add_child(Global.PLAYER)
 		Global.PLAYER = null
-	Global.WORLD_PROJECTILES = $projectiles as Node2D
+	Global.WORLD = self as Node2D
 
 func _process(_delta: float) -> void:
 	background.transform.origin = camera.get_screen_center_position() * 0.4

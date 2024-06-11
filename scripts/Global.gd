@@ -5,7 +5,7 @@ static var GEN_STEP: int = 0
 
 static var PLAYER: Node2D
 
-static var WORLD_PROJECTILES: Node2D
+static var WORLD: Node2D
 
 # TODO remove dbg kill
 func _input(event: InputEvent) -> void:

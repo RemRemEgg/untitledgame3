@@ -12,6 +12,7 @@ var target_foot_vector: Vector2 = Vector2(0, 0)
 class MOVE_TYPE: enum {LAND, AIR, GROUND, ALL, STATIC}
 const move_names: Array[String] = ["land", "air", "ground", "all", "static"]
 var move_type: int = 0
+var mod_color: Color = Color.WHITE
 
 func process(entity_: Entity) -> void:
 	entity = entity_
@@ -41,6 +42,8 @@ static func generate_new() -> ProcAI:
 	rootfw.finalize()
 	
 	ai.root = rootfw
+	
+	ai.mod_color = Color.from_hsv(randf(), 0.5 + (randf() * 0.3), 1, 1)
 	
 	return ai
 
@@ -137,12 +140,8 @@ class AIFramework extends AIProcessor:
 		if mas.y > 0:
 			m_index = AI.init_mem.size()
 			for i in mas.y: AI.init_mem.append(0.0)
-		#for i in actions.size():
-			#if actions[i] is AIFramework:
-				#(actions[i] as AIFramework).calc_index()
 	func calc_action_indexes() -> void:
 		for i in actions.size(): 
-			#if actions[i] is AIFramework: (actions[i] as AIFramework).calc_action_indexes()
 			if actions[i] is AIAction: (actions[i] as AIAction).calc_index()
 ##framework add############################################################
 	static func generate_new() -> AIFramework:
@@ -214,7 +213,7 @@ class AIAction extends AIProcessor:
 	static var DEADWEIGHT_ACTION: AIAction = AIAction.new().set_type(DEADWEIGHT).finalize()
 	static var AI: ProcAI
 ##action add###############################################################
-	enum {DEADWEIGHT, APPROACH_AND_MELEE, ALIGN_AND_RANGE, ALIGN_AND_POUNCE, ALIGN_AND_CHARGE, }
+	enum {DEADWEIGHT, APPROACH_AND_MELEE, ALIGN_AND_RANGE, ALIGN_AND_POUNCE, ALIGN_AND_CHARGE, LURE_AND_MELEE}
 	var type: int = DEADWEIGHT
 	var m_index: int = -1
 	var init_mem: Array[float] = []
@@ -236,6 +235,7 @@ class AIAction extends AIProcessor:
 			ALIGN_AND_RANGE: return align_and_range
 			ALIGN_AND_POUNCE: return align_and_pounce
 			ALIGN_AND_CHARGE: return align_and_charge
+			LURE_AND_MELEE: return lure_and_melee
 			_: return deadweight
 ##action add###############################################################
 	func min_memory_size() -> int:
@@ -244,6 +244,7 @@ class AIAction extends AIProcessor:
 			ALIGN_AND_RANGE: return 1
 			ALIGN_AND_POUNCE: return 1
 			ALIGN_AND_CHARGE: return 3
+			LURE_AND_MELEE: return 1
 		return 0
 	func calc_index() -> void:
 		m_index = AI.init_mem.size()
@@ -253,7 +254,7 @@ class AIAction extends AIProcessor:
 ##action add###############################################################
 	static func generate_new() -> AIAction:
 		var ac := AIAction.new()
-		ac.type = randi_range(APPROACH_AND_MELEE, ALIGN_AND_CHARGE)
+		ac.type = randi_range(APPROACH_AND_MELEE, LURE_AND_MELEE)
 		return ac
 
 #regionMoverTypes#############################################################################################################################################################################
@@ -288,12 +289,9 @@ class AIAction extends AIProcessor:
 		pp.collision_mask = Global.COLLISION.WORLD
 		pp.position = AI.entity.global_position
 		if AI.entity.get_world_2d().direct_space_state.intersect_point(pp, 1):
-			AI.entity.sprite.modulate = Color(0, 1, 0)
 			var d := Vector2(x_dir, y_dir) * 5 + AI.entity.velocity
 			AI.entity.xyvccelerate(d.normalized() * 1.4)
-		else:
-			AI.entity.sprite.modulate = Color(1, 0, 0)
-			AI.entity.apply_gravity(0.2)
+		else: AI.entity.apply_gravity(0.2)
 	
 	func all_mover(x_dir: float, y_dir: float) -> void:
 		AI.mas = true
@@ -306,8 +304,8 @@ class AIAction extends AIProcessor:
 #endregion####################################################################################################################################################################################
 	
 #regionActionTypeMethods######################################################################################################################################################################
-##############################################################################################################################################################################################
 #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #
+##############################################################################################################################################################################################
 #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #
 
 	func deadweight() -> void:
@@ -368,10 +366,24 @@ class AIAction extends AIProcessor:
 			AI.entity.mem[m_index + 2] = 16
 			attack.fire(AI, Vector2(AI.entity.mem[m_index + 1], 0))
 			mover.call(AI.entity.mem[m_index + 1] * 2, 0)
+	
+	func lure_and_melee() -> void:
+		if AI.entity.is_attack_locked: mover.call(0, 0)
+		elif (AI.target_distance > 32**2 && AI.target_distance < 300**2):
+			mover.call(sign(AI.target_vector.x) * -0.2, sign(AI.target_foot_vector.y) * 0.1)
+			if AI.entity.lock_timer <= 0.0: AI.entity.lock_timer = 360
+		elif AI.target_distance > 32**2: mover.call(0, 0)
+		else:
+			AI.entity.is_attack_locked = true
+			AI.entity.lock_timer = 45.0
+			mover.call(0, 0)
+			AI.entity.velocity = (AI.target_foot_vector.normalized() -
+				Vector2(0, 0.15)).normalized() * 0.075 * AI.entity.speed * sqrt(AI.target_distance)
+			attack.fire(AI, AI.target_vector)
 
 #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #
-#  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #
 ##############################################################################################################################################################################################
+#  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #
 #endregion####################################################################################################################################################################################
 
 	func _to_string() -> String:
@@ -386,7 +398,7 @@ class Attack:
 	static func from_action(action: AIAction) -> Attack:
 		var attack: Attack = Attack.new()
 		match action.type:
-			AIAction.APPROACH_AND_MELEE, AIAction.ALIGN_AND_POUNCE, AIAction.ALIGN_AND_CHARGE:
+			AIAction.APPROACH_AND_MELEE, AIAction.ALIGN_AND_POUNCE, AIAction.ALIGN_AND_CHARGE, AIAction.LURE_AND_MELEE:
 				var proj := Projectile.new()
 				proj.base_type = Projectile.bases.SWING
 				proj.max_time = 20
