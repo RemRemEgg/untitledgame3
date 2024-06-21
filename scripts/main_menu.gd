@@ -25,7 +25,7 @@ func load_game() -> void:
 
 # TODO setup savefiles
 func new_game() -> void:
-	get_tree().change_scene_to_file("res://scenes/overworld/world.tscn")
+	get_tree().change_scene_to_file("res://scenes/worlds/overworld.tscn")
 
 # TODO make settings
 func settings() -> void: pass

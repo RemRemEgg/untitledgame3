@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://bxs1frc7lrmxi" path="res://assets/textures/ui/background.png" id="1_sa6d7"]
 [ext_resource type="TileSet" uid="uid://dmwld4t76mv3h" path="res://assets/tilemaps/ground.tres" id="1_w4icx"]
-[ext_resource type="Script" path="res://scripts/world.gd" id="1_yqk23"]
+[ext_resource type="Script" path="res://scripts/World.gd" id="1_yqk23"]
 
 [node name="world" type="Node2D"]
 script = ExtResource("1_yqk23")
