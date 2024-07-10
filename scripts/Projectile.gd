@@ -32,6 +32,7 @@ func fire(origin_: Entity, direction: Vector2) -> Projectile:
 	var cproj := SCENE.instantiate()
 	cproj.set_script(Projectile)
 	var proj: Projectile = cproj as Projectile
+	
 	proj.origin = origin_
 	proj.velocity = direction
 	proj._ready()

@@ -57,7 +57,6 @@ func parse_command(text: String) -> void:
 			if args.size() < 2: return self.print("Current FPS target is %s (%s mspt), running at %s" % [Engine.max_fps,round(1000/Engine.max_fps),Engine.get_frames_per_second()])
 			Engine.max_fps = int(args[1])
 			self.print("FPS target set to %s (%s mspt), running at %s" % [Engine.max_fps,round(1000/Engine.max_fps),Engine.get_frames_per_second()])
-			pass
 		"ai":
 			if args.size() < 2: return print_err("Not enough arguments for command")
 			match args[1]:
@@ -87,9 +86,13 @@ func parse_command(text: String) -> void:
 			exp.parse(" ".join(args.slice(1)))
 			self.print(str(exp.execute()))
 		"test":
-			var i := 0
-			i -= 1024
-			self.print(str(i >> 8))
+			self.print("%s" % ItemData.ids.ROCK)
+			self.print("%s" % ItemData.lookup(ItemData.ids.ROCK))
+			self.print("%s" % ItemData.lookup(2))
+		"timescale":
+			if args.size() < 2: return print_err("Not enough arguments for command")
+			Engine.time_scale = float(args[1])
+			self.print("Timescale set to %s" % Engine.time_scale)
 		_: print_err("Unknown Command '%s'" % args[0])
 
 func split_in_same_level(text: String, blade: String) -> Array[String]:

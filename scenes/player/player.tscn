@@ -4,23 +4,17 @@
 [ext_resource type="Texture2D" uid="uid://b784vapcdbjkq" path="res://assets/textures/player/player.png" id="2_ccsth"]
 [ext_resource type="PackedScene" uid="uid://bkb344rfhejjb" path="res://scenes/ui/hud.tscn" id="3_k6lh3"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_d3afe"]
-size = Vector2(12, 22)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_3u5vl"]
+radius = 6.0
+height = 22.0
 
 [node name="player" type="CharacterBody2D"]
 collision_layer = 0
 collision_mask = 0
 script = ExtResource("1_onugq")
 
-[node name="ColorRect" type="ColorRect" parent="."]
-visible = false
-offset_left = -20.0
-offset_top = -18.0
-offset_right = 20.0
-offset_bottom = 22.0
-
 [node name="collider" type="CollisionShape2D" parent="."]
-shape = SubResource("RectangleShape2D_d3afe")
+shape = SubResource("CapsuleShape2D_3u5vl")
 debug_color = Color(0, 0.701961, 0.211765, 0.419608)
 
 [node name="sprite" type="Sprite2D" parent="."]

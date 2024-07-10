@@ -3,11 +3,11 @@ extends CharacterBody2D
 
 var idelta: float = 0.0
 var iof: bool = false
-var friction: float = 0.14
-var air_friction: float = 0.035
-var speed: float = 128.0
-var acceleration: float = 24
-var gravity: Vector2 = Vector2(0.0, 15.0)
+var friction: float = 0.1
+var air_friction: float = 0.025
+var speed: float = 90
+var acceleration: float = 16
+var gravity: Vector2 = Vector2(0.0, 11)
 
 func apply_gravity(mult: float) -> void: velocity += gravity * idelta * mult
 func xccelerate(direction: float) -> void: velocity = velocity.move_toward(Vector2(direction * speed, velocity.y), acceleration * idelta)

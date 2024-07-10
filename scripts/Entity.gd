@@ -2,7 +2,7 @@ class_name Entity
 extends CustomPhysicsObject
 
 @onready var collider: CollisionShape2D = $collider as CollisionShape2D
-@onready var col_shape: RectangleShape2D = collider.shape as RectangleShape2D
+@onready var col_shape: Shape2D = collider.shape as Shape2D
 @onready var sprite: Sprite2D = $sprite as Sprite2D
 
 var proc_ai: ProcAI
@@ -23,14 +23,14 @@ var hurt_time: float = 0.0
 var death_time: float = 0.0
 
 static var TEMP_CONST_PROCAI: ProcAI
-static var AIS: Array[ProcAI] = [ProcAI.generate_new()]
-static var AI_STEP = 0
+static var AIS: Array[ProcAI] = []
+static var AI_STEP = -1
 static var RAND := true
 
 func _ready() -> void:
 	if RAND:
 		AI_STEP += 1
-		if AI_STEP % (AIS.size() * 2) == 0:
+		if AIS.size() == 0 || AI_STEP % (AIS.size() * 2) == 0:
 			var n := ProcAI.generate_new()
 			AIS.append(n)
 			n.register_entity(self)

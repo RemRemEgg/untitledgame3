@@ -29,7 +29,7 @@ func process(entity_: Entity) -> void:
 	root.root_call(self)
 	if mas: entity.move_and_slide()
 
-func update_target() -> void: entity.target = entity.get_tree().root.get_node("world/player") as Entity
+func update_target() -> void: entity.target = entity.get_tree().root.get_node("world/players/player") as Entity
 
 static func generate_new() -> ProcAI:
 	var ai: ProcAI = ProcAI.new()
@@ -413,7 +413,8 @@ class Attack:
 				proj.speed *= 2.4
 				proj.friction = 0.1
 				proj.air_friction = 0.0
-				proj.texture = ItemData.lookup(ItemData.ids.ROCK).texture
+				proj.texture = ItemData.texture_lookup(ItemData.ids.ROCK)
+				print("AAR : %s : %s" % [proj.texture, ItemData.lookup(ItemData.ids.ROCK).texture])
 				proj.set_collisions(true, false, true)
 				attack.projectiles.push_back(proj)
 		return attack

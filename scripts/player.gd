@@ -18,11 +18,11 @@ var active_weapon: int = 0
 var using_time: float = 0.0
 
 func _ready() -> void:
-	friction = 0.16
-	speed = 240.0
-	acceleration = 36
-	gravity = Vector2(0.0, 15.0)
-	jump_power = 320.0
+	friction = 0.14
+	speed = 168
+	acceleration = 25
+	gravity = Vector2(0.0, 11.0)
+	jump_power = 224
 	health = 100.0
 	max_health = health
 	friendly = true
@@ -59,6 +59,11 @@ func respawn() -> void:
 	sprite.self_modulate = Color.WHITE
 	global_position = Vector2.ZERO
 
+func get_feet_pos() -> Vector2: return global_position - Vector2(0.0, col_shape.height / 2.0)
+
+var stairs_timer := 0.0
+var stairs_power := 0.0
+
 func _process(delta: float) -> void:
 	hud.update(self)
 	if death_time > 0.0: return death()
@@ -76,10 +81,36 @@ func _process(delta: float) -> void:
 	if input_dir:
 		sprite.flip_h = input_dir < 0
 		xccelerate(Global.fsign(input_dir))
+		var dss := get_world_2d().direct_space_state
+		var sray_origin := get_global_transform().origin + Vector2(input_dir * 5, 9)
+		var sray := PhysicsRayQueryParameters2D.create(sray_origin, sray_origin + Vector2(0, 8), Global.COLLISION.WORLD)
+		var scol := dss.intersect_ray(sray)
+		if scol:
+			var hray_origin := get_global_transform().origin + Vector2(0, 10)
+			var hray := PhysicsRayQueryParameters2D.create(hray_origin + Vector2(input_dir * 5.5, 0), hray_origin + Vector2(input_dir * 14, 0), Global.COLLISION.WORLD)
+			var hcol := dss.intersect_ray(hray)
+			if hcol:
+				var hp := hcol.get("position") as Vector2
+				var vray_origin := hp + Vector2(input_dir, -20)
+				var vray := PhysicsRayQueryParameters2D.create(vray_origin, vray_origin + Vector2(0, 14), Global.COLLISION.WORLD)
+				var vcol := dss.intersect_ray(vray)
+				if vcol:
+					var vp := vcol.get("position") as Vector2
+					if hp.y - vp.y < 7:
+						var ds := Vector2(hp.x, vp.y) - (hray_origin + Vector2(input_dir * 3, 0))
+						if ds.length_squared() < 4:
+							position = Vector2(hp.x, vp.y) - Vector2(input_dir * 6, 12)
+						else:
+							stairs_timer = 1
+							stairs_power = ds.y
 	else: xccelerate(0)
 	apply_gravity(1.0 + (0.3 if velocity.y > 0 else (!Input.is_action_pressed("jump") as float)))
 	
-	if jump_mem > 0.0:# && cyote > 0.0:
+	if stairs_timer > 0.0:
+		stairs_timer -= idelta
+		velocity.y = stairs_power * 32
+	
+	if jump_mem > 0.0 && cyote > 0.0:
 		cyote = -100.0
 		jump_mem = -100.0
 		jump(input_dir * 0.25)
@@ -87,6 +118,7 @@ func _process(delta: float) -> void:
 	if dash_time < -30: velocity = dash_dir
 	move_and_slide()
 	if dash_time < -30: velocity = dash_dir / dash_power
+	
 	
 	hurt_time -= idelta
 	sprite.self_modulate = Color.WHITE
@@ -160,7 +192,7 @@ class PlayerItem:
 				projectile.terrain_active = true
 			ItemData.NONE, _:
 				projectile = Projectile.new()
-		projectile.texture = data.texture
+		projectile.texture = ItemData.texture_lookup(data.reg_id)
 
 
 

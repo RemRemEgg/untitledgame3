@@ -3,12 +3,19 @@ extends Resource
 
 static var REGISTRY: Array[ItemData] = []
 static var AIR_DATA: ItemData = create(ids.AIR, "", "Air", NONE, [0, 0])
+static var NULL_TEXTURE: ImageTexture
 
 static func lookup(reg_id_: int) -> ItemData:
 	if reg_id_ >= REGISTRY.size(): return AIR_DATA
 	var itda := REGISTRY[reg_id_]
 	if itda: return itda
 	return AIR_DATA
+
+static func texture_lookup(reg_id_: int) -> ImageTexture:
+	if reg_id_ >= REGISTRY.size(): return NULL_TEXTURE
+	var itda := REGISTRY[reg_id_]
+	if itda && itda.texture: return itda.texture
+	return NULL_TEXTURE
 
 var reg_id: int
 var texture: ImageTexture
@@ -35,6 +42,10 @@ const DEF_LAUNCH: Array[float]  = [20, 16]
 
 class ids: enum {AIR, SWORD, ROCK, CHERRY}
 static func register_all() -> void:
+	var image: Image = Image.create_from_data(2, 2, false, Image.FORMAT_RGB8, [0,0,0,0xff,0,0xff,0xff,0,0xff,0,0,0])
+	image.resize(16, 16, 0)
+	NULL_TEXTURE = ImageTexture.create_from_image(image)
+	
 	register(AIR_DATA)
 	var reges: Array[ItemData] = [
 		create(ids.SWORD, "item/sword", "Sword", SWING, []),
@@ -73,5 +84,5 @@ static func create(reg_id_: int, texture_path_: String, name_: String, use_type_
 static func load_texture(path: String) -> ImageTexture:
 	if !FileAccess.file_exists(path):
 		Console.print_err("Failed to load texture '%s'" % path)
-		return ImageTexture.new()
+		return NULL_TEXTURE
 	return ImageTexture.create_from_image(Image.load_from_file(ProjectSettings.globalize_path(path)))

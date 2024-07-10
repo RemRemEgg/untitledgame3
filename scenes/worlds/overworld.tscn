@@ -1,21 +1,16 @@
-[gd_scene load_steps=12 format=3 uid="uid://cs2e0jcki0iap"]
+[gd_scene load_steps=9 format=3 uid="uid://cs2e0jcki0iap"]
 
 [ext_resource type="Texture2D" uid="uid://bxs1frc7lrmxi" path="res://assets/textures/ui/background.png" id="1_enyah"]
 [ext_resource type="Script" path="res://scripts/overworld.gd" id="1_sgfeu"]
 [ext_resource type="Shader" path="res://assets/shaders/ground_tile.gdshader" id="3_2begb"]
 [ext_resource type="Texture2D" uid="uid://p6011eoldcgt" path="res://assets/textures/world/ground.png" id="4_yygnf"]
 [ext_resource type="PackedScene" uid="uid://dohjk3rx0rj3k" path="res://scenes/player/player.tscn" id="5_sivf3"]
-[ext_resource type="Shader" path="res://assets/shaders/slow_glitch.gdshader" id="6_qo2fh"]
-[ext_resource type="Texture2D" uid="uid://d15xv4nnym4c3" path="res://assets/textures/ui/loading.png" id="7_6a0jf"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_d3qf7"]
 shader = ExtResource("3_2begb")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ddxut"]
 size = Vector2(16, 16)
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_5miwr"]
-shader = ExtResource("6_qo2fh")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bwss4"]
 size = Vector2(324, 94)
@@ -100,21 +95,12 @@ shape = SubResource("RectangleShape2D_ddxut")
 
 [node name="entities" type="Node2D" parent="."]
 
-[node name="projectiles" type="Node2D" parent="."]
+[node name="players" type="Node2D" parent="."]
 
-[node name="player" parent="." instance=ExtResource("5_sivf3")]
+[node name="player" parent="players" instance=ExtResource("5_sivf3")]
 position = Vector2(487, 0)
 
-[node name="loading_text" type="TextureRect" parent="player"]
-visible = false
-material = SubResource("ShaderMaterial_5miwr")
-offset_left = -317.0
-offset_top = -194.0
-offset_right = -277.0
-offset_bottom = -154.0
-scale = Vector2(4, 4)
-texture = ExtResource("7_6a0jf")
-stretch_mode = 2
+[node name="projectiles" type="Node2D" parent="."]
 
 [node name="start_game_area" type="Area2D" parent="."]
 position = Vector2(550, 1633)
