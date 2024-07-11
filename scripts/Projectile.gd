@@ -22,6 +22,7 @@ var pierce: int = 0   ###
 var kill_no_origin: bool = true   ###
 var terrain_active: bool = false   ###
 var readied: bool = false
+var damage: float = 0.0   ###
 
 func _to_string() -> String:
 	var sb := "Proj<%s> Mt: %s, p: %s, KNO: %s, col: %s%s%s" % [base.get_method(), max_time, pierce, kill_no_origin,\
@@ -63,6 +64,7 @@ func solidify_from(other: Projectile) -> void:
 	speed = other.speed
 	acceleration = other.acceleration
 	gravity = other.gravity
+	damage = other.damage
 	
 	friendly = other.friendly
 	hostile = other.hostile
@@ -104,7 +106,7 @@ func collide_with_body(body_rid: RID, body: Node2D, _bsi: int, _lsi: int) -> voi
 	if pierce == -1: kill()
 
 func generate_damage_event() -> DamageEvent:
-	var dmg: DamageEvent = DamageEvent.create(10)
+	var dmg: DamageEvent = DamageEvent.create(self.damage)
 	return dmg
 
 func kill() -> void:

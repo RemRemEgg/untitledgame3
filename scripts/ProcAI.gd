@@ -405,6 +405,7 @@ class Attack:
 				proj.pierce = -1
 				proj.texture = ImageTexture.create_from_image(Image.load_from_file(ProjectSettings.globalize_path("res://assets/textures/mobs/golem_fist.png")))
 				proj.set_collisions(true, false, false)
+				proj.damage = 10
 				attack.projectiles.push_back(proj)
 			AIAction.ALIGN_AND_RANGE:
 				var proj := Projectile.new()
@@ -414,8 +415,8 @@ class Attack:
 				proj.friction = 0.1
 				proj.air_friction = 0.0
 				proj.texture = ItemData.texture_lookup(ItemData.ids.ROCK)
-				print("AAR : %s : %s" % [proj.texture, ItemData.lookup(ItemData.ids.ROCK).texture])
 				proj.set_collisions(true, false, true)
+				proj.damage = 7
 				attack.projectiles.push_back(proj)
 		return attack
 	

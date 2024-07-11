@@ -13,9 +13,10 @@ var cyote: float = 0.0;
 var jump_mem: float = 0.0
 
 # TODO weaponry
-var weapons: Array[PlayerItem] = [null, null]
+var weapons: Array[PlayerItem] = [PlayerItem.from(ItemData.ids.SWORD), PlayerItem.from(ItemData.ids.ROCK)]
 var active_weapon: int = 0
 var using_time: float = 0.0
+var using_item: bool = false
 
 func _ready() -> void:
 	friction = 0.14
@@ -58,6 +59,7 @@ func respawn() -> void:
 	velocity = Vector2.ZERO
 	sprite.self_modulate = Color.WHITE
 	global_position = Vector2.ZERO
+	Global.WORLD.to_overworld()
 
 func get_feet_pos() -> Vector2: return global_position - Vector2(0.0, col_shape.height / 2.0)
 
@@ -119,10 +121,11 @@ func _process(delta: float) -> void:
 	move_and_slide()
 	if dash_time < -30: velocity = dash_dir / dash_power
 	
-	
 	hurt_time -= idelta
 	sprite.self_modulate = Color.WHITE
 	if hurt_time > 0: sprite.self_modulate = Color.PALE_VIOLET_RED
+	
+	if using_item: use_item(weapons[0])
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey:
@@ -132,22 +135,18 @@ func _input(event: InputEvent) -> void:
 			if !dir: dir = Vector2(-1.0 if sprite.flip_h else 1.0, 0.0);
 			dash_time = -33
 			dash_dir = dir * speed * dash_power
+		if event.keycode == KEY_CTRL: Engine.time_scale = 0.25 if event.pressed else 1.0
 	if event is InputEventMouseButton:
 		var eiemb: InputEventMouseButton = event as InputEventMouseButton
 		match eiemb.button_index:
 			# TODO weaponry
-			1 when eiemb.pressed && weapons[0]: use_item(weapons[0])
+			1: using_item = eiemb.pressed
 			2 when eiemb.pressed && weapons[1]: use_item(weapons[1])
 			3 when eiemb.pressed: pass
 			4 when eiemb.pressed:
-				for i in range(1):
-					var dummy: Entity = (load("res://scenes/world/entity.tscn") as PackedScene).instantiate() as Entity
-					dummy.global_transform.origin = get_global_mouse_position()
-					dummy.friendly = false
-					get_node("/root/world/entities").add_child(dummy)
-			5:
-				ItemData.register_all()
-				weapons = [PlayerItem.from(ItemData.ids.SWORD), PlayerItem.from(ItemData.ids.ROCK)]
+				Engine.time_scale *= 2
+			5 when eiemb.pressed:
+				Engine.time_scale *= 0.5
 			_: pass
 
 func use_item(item: PlayerItem) -> void:
@@ -181,18 +180,19 @@ class PlayerItem:
 				projectile = Projectile.new()
 				projectile.base_type = Projectile.bases.SWING
 				projectile.pierce = -1
-				projectile.max_time = data.stats[0]
+				projectile.max_time = data.stats[ItemData.S_USE_TIME]
 			ItemData.THROW:
 				projectile = Projectile.new()
 				projectile.base_type = Projectile.bases.ARROW
 				projectile.speed *= 3
 				projectile.friction = 0.1
 				projectile.air_friction = 0.0
-				projectile.max_time = data.stats[0] * 3
+				projectile.max_time = data.stats[ItemData.S_USE_TIME] * 3
 				projectile.terrain_active = true
 			ItemData.NONE, _:
 				projectile = Projectile.new()
 		projectile.texture = ItemData.texture_lookup(data.reg_id)
+		projectile.damage = data.stats[ItemData.S_DAMAGE]
 
 
 

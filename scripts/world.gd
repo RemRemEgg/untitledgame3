@@ -26,3 +26,7 @@ func catch_player() -> Player:
 	PLAYERS.add_child(player)
 	Global.PLAYER = null
 	return player
+
+func to_overworld() -> void:
+	throw_player()
+	get_tree().change_scene_to_file("res://scenes/worlds/overworld.tscn")

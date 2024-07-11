@@ -35,10 +35,16 @@ enum {
 	CONSUME
 }
 
-const DEF_NONE: Array[float]    = [20, 16]
+enum {
+	S_USE_TIME,
+	S_SIZE,
+	S_DAMAGE
+}
+#TODO: make [1] work
+const DEF_NONE: Array[float]    = [20, 16, 10]
 const DEF_SWING: Array[float]   = [20, 16, 10]
-const DEF_THROW: Array[float]   = [20, 16]
-const DEF_LAUNCH: Array[float]  = [20, 16]
+const DEF_THROW: Array[float]   = [20, 16, 10]
+const DEF_LAUNCH: Array[float]  = [20, 16, 10]
 
 class ids: enum {AIR, SWORD, ROCK, CHERRY}
 static func register_all() -> void:
@@ -48,7 +54,7 @@ static func register_all() -> void:
 	
 	register(AIR_DATA)
 	var reges: Array[ItemData] = [
-		create(ids.SWORD, "item/sword", "Sword", SWING, []),
+		create(ids.SWORD, "item/sword", "Sword", SWING, [15, 32, 15]),
 		create(ids.ROCK, "item/rock", "Rock lmao", THROW, []),
 		create(ids.CHERRY, "item/cherry", "cherry (yummy)", CONSUME, [])
 	]
