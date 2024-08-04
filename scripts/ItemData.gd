@@ -2,7 +2,7 @@ class_name ItemData
 extends Resource
 
 static var REGISTRY: Array[ItemData] = []
-static var AIR_DATA: ItemData = create(ids.AIR, "", "Air", NONE, [0, 0])
+static var AIR_DATA: ItemData = create(ids.AIR, "", "Air", TYPE_NONE, [0, 0])
 static var NULL_TEXTURE: ImageTexture
 
 static func lookup(reg_id_: int) -> ItemData:
@@ -28,11 +28,11 @@ var projectiles: Array[ProjectileData] = []
 class ProjectileData: var x: int
 
 enum {
-	NONE,    # [ usetime, scale
-	SWING,   # + damage
-	THROW,
-	LAUNCH,
-	CONSUME
+	TYPE_NONE,    # [ usetime, scale
+	TYPE_SWING,   # + damage
+	TYPE_THROW,
+	TYPE_LAUNCH,
+	TYPE_CONSUME
 }
 
 enum {
@@ -54,9 +54,9 @@ static func register_all() -> void:
 	
 	register(AIR_DATA)
 	var reges: Array[ItemData] = [
-		create(ids.SWORD, "item/sword", "Sword", SWING, [15, 32, 15]),
-		create(ids.ROCK, "item/rock", "Rock lmao", THROW, []),
-		create(ids.CHERRY, "item/cherry", "cherry (yummy)", CONSUME, [])
+		create(ids.SWORD, "item/sword", "Sword", TYPE_SWING, [15, 32, 15]),
+		create(ids.ROCK, "item/rock", "Rock lmao", TYPE_THROW, []),
+		create(ids.CHERRY, "item/cherry", "cherry (yummy)", TYPE_CONSUME, [])
 	]
 	for i in range(reges.size()):
 		register(reges[i])
@@ -77,10 +77,10 @@ static func create(reg_id_: int, texture_path_: String, name_: String, use_type_
 	
 	var def_stats: Array[float]
 	match use_type_:
-		NONE: def_stats = DEF_NONE
-		SWING: def_stats = DEF_SWING
-		THROW: def_stats = DEF_THROW
-		LAUNCH: def_stats = DEF_LAUNCH
+		TYPE_NONE: def_stats = DEF_NONE
+		TYPE_SWING: def_stats = DEF_SWING
+		TYPE_THROW: def_stats = DEF_THROW
+		TYPE_LAUNCH: def_stats = DEF_LAUNCH
 	for i in range(def_stats.size()):
 		if stats_.size() <= i:
 			stats_.push_back(def_stats[i])

@@ -150,7 +150,7 @@ func _input(event: InputEvent) -> void:
 			_: pass
 
 func use_item(item: PlayerItem) -> void:
-	if using_time <= 0.0 && item.data.use_type != ItemData.NONE:
+	if using_time <= 0.0 && item.data.use_type != ItemData.TYPE_NONE:
 		using_time = item.data.stats[0]
 		# TODO weaponry
 		item.get_projectile().fire(self, get_global_mouse_position() - global_position).add_to_world()
@@ -176,12 +176,12 @@ class PlayerItem:
 	func create_projectile() -> void:
 		if !data: data = ItemData.AIR_DATA
 		match data.use_type:
-			ItemData.SWING:
+			ItemData.TYPE_SWING:
 				projectile = Projectile.new()
 				projectile.base_type = Projectile.bases.SWING
 				projectile.pierce = -1
 				projectile.max_time = data.stats[ItemData.S_USE_TIME]
-			ItemData.THROW:
+			ItemData.TYPE_THROW:
 				projectile = Projectile.new()
 				projectile.base_type = Projectile.bases.ARROW
 				projectile.speed *= 3
@@ -189,7 +189,7 @@ class PlayerItem:
 				projectile.air_friction = 0.0
 				projectile.max_time = data.stats[ItemData.S_USE_TIME] * 3
 				projectile.terrain_active = true
-			ItemData.NONE, _:
+			ItemData.TYPE_NONE, _:
 				projectile = Projectile.new()
 		projectile.texture = ItemData.texture_lookup(data.reg_id)
 		projectile.damage = data.stats[ItemData.S_DAMAGE]
