@@ -1,12 +1,21 @@
-[gd_scene load_steps=9 format=3 uid="uid://ch07baps1p0bg"]
+[gd_scene load_steps=11 format=3 uid="uid://ch07baps1p0bg"]
 
 [ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_cnpwn"]
 [ext_resource type="Texture2D" uid="uid://bxs1frc7lrmxi" path="res://assets/textures/ui/background.png" id="2_7gg1u"]
-[ext_resource type="Theme" uid="uid://buffpyiljjxes" path="res://assets/other/ui_theme.tres" id="3_8aq2h"]
 [ext_resource type="Shader" path="res://assets/shaders/slow_glitch.gdshader" id="3_dyben"]
 [ext_resource type="Texture2D" uid="uid://d15xv4nnym4c3" path="res://assets/textures/ui/loading.png" id="4_5v88m"]
 [ext_resource type="Texture2D" uid="uid://bfppsujvb7qhi" path="res://assets/textures/ui/button.png" id="4_ir5is"]
+[ext_resource type="Theme" uid="uid://dgcxu3djicdjt" path="res://assets/other/ui_theme_small.tres" id="5_ef1u6"]
 [ext_resource type="Script" path="res://scripts/main_menu_buttons.gd" id="5_u2a4g"]
+
+[sub_resource type="SystemFont" id="SystemFont_m3s5m"]
+font_names = PackedStringArray("Rockwell")
+subpixel_positioning = 0
+oversampling = 4.0
+
+[sub_resource type="Theme" id="Theme_2axu8"]
+default_font = SubResource("SystemFont_m3s5m")
+default_font_size = 32
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_4xq4q"]
 shader = ExtResource("3_dyben")
@@ -31,15 +40,7 @@ grow_vertical = 2
 texture = ExtResource("2_7gg1u")
 stretch_mode = 6
 
-[node name="menu" type="Control" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="margin" type="MarginContainer" parent="menu"]
+[node name="margin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -51,32 +52,52 @@ theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="vbox" type="VBoxContainer" parent="menu/margin"]
+[node name="main" type="Control" parent="margin"]
 layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="vbox" type="VBoxContainer" parent="margin/main"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -130.0
+offset_top = -168.0
+offset_right = 130.0
+offset_bottom = 168.0
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_horizontal = 4
 theme_override_constants/separation = 64
 alignment = 1
 
-[node name="title" type="Label" parent="menu/margin/vbox"]
-layout_mode = 2
-theme = ExtResource("3_8aq2h")
-text = "untitledgame3"
-
-[node name="vbox" type="VBoxContainer" parent="menu/margin/vbox"]
+[node name="title" type="Label" parent="margin/main/vbox"]
 layout_mode = 2
 size_flags_horizontal = 4
+theme = SubResource("Theme_2axu8")
+text = "untitledgame3"
+
+[node name="vbox" type="VBoxContainer" parent="margin/main/vbox"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 theme_override_constants/separation = 8
 alignment = 1
 
-[node name="new_game" type="TextureButton" parent="menu/margin/vbox/vbox"]
+[node name="h_box_container" type="HBoxContainer" parent="margin/main/vbox/vbox"]
 layout_mode = 2
-size_flags_horizontal = 0
+
+[node name="singleplayer" type="TextureButton" parent="margin/main/vbox/vbox/h_box_container"]
+layout_mode = 2
+size_flags_horizontal = 4
 size_flags_vertical = 4
 texture_normal = ExtResource("4_ir5is")
 script = ExtResource("5_u2a4g")
-function = "new_game"
+function = "to_singleplayer"
 
-[node name="text" type="Label" parent="menu/margin/vbox/vbox/new_game"]
+[node name="text" type="Label" parent="margin/main/vbox/vbox/h_box_container/singleplayer"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -89,21 +110,48 @@ offset_right = 42.5
 offset_bottom = 11.5
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("3_8aq2h")
+theme = SubResource("Theme_2axu8")
 theme_override_font_sizes/font_size = 16
-text = "New Game"
+text = "Singleplayer"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="settings" type="TextureButton" parent="menu/margin/vbox/vbox"]
+[node name="multiplayer" type="TextureButton" parent="margin/main/vbox/vbox/h_box_container"]
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("4_ir5is")
+script = ExtResource("5_u2a4g")
+function = "to_multiplayer"
+
+[node name="text" type="Label" parent="margin/main/vbox/vbox/h_box_container/multiplayer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -42.5
+offset_top = -11.5
+offset_right = 42.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_2axu8")
+theme_override_font_sizes/font_size = 16
+text = "Multiplayer"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="settings" type="TextureButton" parent="margin/main/vbox/vbox"]
+layout_mode = 2
+size_flags_horizontal = 4
 size_flags_vertical = 4
 texture_normal = ExtResource("4_ir5is")
 script = ExtResource("5_u2a4g")
 function = "settings"
 
-[node name="text" type="Label" parent="menu/margin/vbox/vbox/settings"]
+[node name="text" type="Label" parent="margin/main/vbox/vbox/settings"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -116,21 +164,21 @@ offset_right = 42.5
 offset_bottom = 11.5
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("3_8aq2h")
+theme = SubResource("Theme_2axu8")
 theme_override_font_sizes/font_size = 16
 text = "Settings"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="exit" type="TextureButton" parent="menu/margin/vbox/vbox"]
+[node name="exit" type="TextureButton" parent="margin/main/vbox/vbox"]
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 4
 size_flags_vertical = 4
 texture_normal = ExtResource("4_ir5is")
 script = ExtResource("5_u2a4g")
 function = "exit"
 
-[node name="text" type="Label" parent="menu/margin/vbox/vbox/exit"]
+[node name="text" type="Label" parent="margin/main/vbox/vbox/exit"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -143,9 +191,176 @@ offset_right = 42.5
 offset_bottom = 11.5
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("3_8aq2h")
+theme = SubResource("Theme_2axu8")
 theme_override_font_sizes/font_size = 16
 text = "Exit"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="singleplayer" type="Control" parent="margin"]
+visible = false
+layout_mode = 2
+
+[node name="vbox" type="VBoxContainer" parent="margin/singleplayer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -188.5
+offset_top = -168.0
+offset_right = 188.5
+offset_bottom = 168.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="title" type="Label" parent="margin/singleplayer/vbox"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme = SubResource("Theme_2axu8")
+text = "singleplayer"
+
+[node name="new" type="TextureButton" parent="margin/singleplayer/vbox"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("4_ir5is")
+script = ExtResource("5_u2a4g")
+function = "new_game"
+
+[node name="text" type="Label" parent="margin/singleplayer/vbox/new"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -42.5
+offset_top = -11.5
+offset_right = 42.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_2axu8")
+theme_override_font_sizes/font_size = 16
+text = "New Game"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="back" type="TextureButton" parent="margin/singleplayer/vbox"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("4_ir5is")
+script = ExtResource("5_u2a4g")
+function = "back"
+
+[node name="text" type="Label" parent="margin/singleplayer/vbox/back"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -42.5
+offset_top = -11.5
+offset_right = 42.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_2axu8")
+theme_override_font_sizes/font_size = 16
+text = "Back"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="multiplayer" type="Control" parent="margin"]
+visible = false
+layout_mode = 2
+
+[node name="vbox" type="VBoxContainer" parent="margin/multiplayer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -84.0
+offset_top = -168.0
+offset_right = 84.0
+offset_bottom = 168.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="title" type="Label" parent="margin/multiplayer/vbox"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme = SubResource("Theme_2axu8")
+text = "multiplayer"
+
+[node name="ip_input" type="LineEdit" parent="margin/multiplayer/vbox"]
+layout_mode = 2
+theme = ExtResource("5_ef1u6")
+placeholder_text = "IP Address"
+
+[node name="join" type="TextureButton" parent="margin/multiplayer/vbox"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("4_ir5is")
+script = ExtResource("5_u2a4g")
+function = "join_game"
+
+[node name="text" type="Label" parent="margin/multiplayer/vbox/join"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -42.5
+offset_top = -11.5
+offset_right = 42.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_2axu8")
+theme_override_font_sizes/font_size = 16
+text = "WIP"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="back" type="TextureButton" parent="margin/multiplayer/vbox"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = ExtResource("4_ir5is")
+script = ExtResource("5_u2a4g")
+function = "back"
+
+[node name="text" type="Label" parent="margin/multiplayer/vbox/back"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -42.5
+offset_top = -11.5
+offset_right = 42.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_2axu8")
+theme_override_font_sizes/font_size = 16
+text = "Back"
 horizontal_alignment = 1
 vertical_alignment = 1
 

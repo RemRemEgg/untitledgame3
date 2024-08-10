@@ -51,6 +51,8 @@ static func register_all() -> void:
 	var image: Image = Image.create_from_data(2, 2, false, Image.FORMAT_RGB8, [0,0,0,0xff,0,0xff,0xff,0,0xff,0,0,0])
 	image.resize(16, 16, 0)
 	NULL_TEXTURE = ImageTexture.create_from_image(image)
+	if NULL_TEXTURE != null: Console.print("NULL_TEXTURE created")
+	Console.print("Loading items")
 	
 	register(AIR_DATA)
 	var reges: Array[ItemData] = [
@@ -58,15 +60,21 @@ static func register_all() -> void:
 		create(ids.ROCK, "item/rock", "Rock lmao", TYPE_THROW, []),
 		create(ids.CHERRY, "item/cherry", "cherry (yummy)", TYPE_CONSUME, [])
 	]
-	for i in range(reges.size()):
-		register(reges[i])
+	REGISTRY.resize(reges.size())
+	var total_reg: int = 0
+	for i in range(reges.size()): total_reg += register(reges[i])
+	Console.print("Registered %s items, %s duplicate(s)" % [total_reg, reges.size() - total_reg])
+	REGISTRY.resize(total_reg)
 
 func _to_string() -> String: return "Item[id=%s,name=%s,type=%s]" % [reg_id, name, use_type]
 
-static func register(item: ItemData) -> void:
+static func register(item: ItemData) -> int:
 	if REGISTRY.size() <= item.reg_id: REGISTRY.resize(item.reg_id + 1)
-	if REGISTRY[item.reg_id] != null: Console.print_err("Duplicate registration for item '%s'" % item)
+	if REGISTRY[item.reg_id] != null:
+		Console.print_err("Duplicate registration for item '%s'" % item)
+		return 0
 	REGISTRY[item.reg_id] = item
+	return 1
 
 static func create(reg_id_: int, texture_path_: String, name_: String, use_type_: int, stats_: Array[float]) -> ItemData:
 	var item: ItemData = ItemData.new()
@@ -91,4 +99,6 @@ static func load_texture(path: String) -> ImageTexture:
 	if !FileAccess.file_exists(path):
 		Console.print_err("Failed to load texture '%s'" % path)
 		return NULL_TEXTURE
-	return ImageTexture.create_from_image(Image.load_from_file(ProjectSettings.globalize_path(path)))
+	var texture := ImageTexture.create_from_image(Image.load_from_file(ProjectSettings.globalize_path(path)))
+	Console.print("Loading from disk: \"%s\"" % path)
+	return texture

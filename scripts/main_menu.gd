@@ -1,31 +1,37 @@
 extends Control
 
-@onready var loading: Control = $loading as Control
-@onready var loading_text: TextureRect = $loading/loading_text as TextureRect
-@onready var curtain: ColorRect = $loading/curtain as ColorRect
+@onready var main_menu: Control = $margin/main as Control
+@onready var multiplayer_menu: Control = $margin/multiplayer as Control
+@onready var singleplayer_menu: Control = $margin/singleplayer as Control
 
-func _ready() -> void:
-	Engine.max_fps = 60
-	loading.visible = true
-	call_deferred("load_game")
+func _ready() -> void: pass
 
-func finish_loading() -> void:
-	for i in range(50):
-		curtain.color.a -= 0.02
-		await get_tree().create_timer(0.01).timeout
-	remove_child(loading)
-	loading.call_deferred("queue_free")
-
-func load_game() -> void:
-	ItemData.register_all()
-	await get_tree().create_timer(0).timeout
-	loading_text.visible = false
-	Entity.TEMP_CONST_PROCAI = ProcAI.generate_new()
-	finish_loading()
+func move() -> void:
+	main_menu.visible = false
+	main_menu.set_process(false)
 
 # TODO setup savefiles
 func new_game() -> void:
 	get_tree().change_scene_to_file("res://scenes/worlds/overworld.tscn")
+
+func to_singleplayer() -> void:
+	move()
+	singleplayer_menu.visible = true
+	singleplayer_menu.set_process(true)
+
+func to_multiplayer() -> void:
+	move()
+	multiplayer_menu.visible = true
+	multiplayer_menu.set_process(true)
+
+func back() -> void:
+	main_menu.visible = true
+	main_menu.set_process(true)
+	
+	multiplayer_menu.visible = false
+	multiplayer_menu.set_process(false)
+	singleplayer_menu.visible = false
+	singleplayer_menu.set_process(false)
 
 # TODO make settings
 func settings() -> void: pass

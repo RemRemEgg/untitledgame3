@@ -3,13 +3,13 @@ extends CanvasLayer
 @onready var lines: RichTextLabel = $margin/vbox/lines as RichTextLabel
 @onready var input: LineEdit = $margin/vbox/input as LineEdit
 
-var active: bool = false
+var active: bool = true
 var history: Array[String] = []
 var h_index = -1
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey && event.is_pressed():
-		if event.is_action("dbg_console"): call_deferred("toggle")
+		if event.is_action("dbg_console") || (event.is_action("esc") && active): call_deferred("toggle")
 		if event.keycode == KEY_UP:
 			h_index = clamp(h_index +1, -1, history.size() -1)
 			input.text = ""

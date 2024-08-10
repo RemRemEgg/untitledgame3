@@ -1,0 +1,11 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://dgcxu3djicdjt"]
+
+[sub_resource type="SystemFont" id="SystemFont_m3s5m"]
+font_names = PackedStringArray("Rockwell")
+font_weight = 300
+subpixel_positioning = 0
+oversampling = 4.0
+
+[resource]
+default_font = SubResource("SystemFont_m3s5m")
+default_font_size = 16
