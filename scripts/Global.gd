@@ -16,7 +16,7 @@ func fsign(num: float) -> int: return int(0<num)-int(num<0)
 
 class COLLISION:
 	static var WORLD_STATIC: int = 0b0001_0001
-	static var WORLD_DYN: int =    0b0010_00100
+	static var WORLD_DYN: int =    0b0010_0010
 	static var WORLD: int = WORLD_DYN | WORLD_STATIC
 	
 	static var HOSTILE_ENT: int =  0b0001_0000_0000
