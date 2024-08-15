@@ -133,7 +133,6 @@ class AIFramework extends AIProcessor:
 		if ret: actions[AI.entity.locks[l_index]].process.call()
 		return ret
 	func calc_index() -> void:
-		var x = AI.l_size
 		l_index = AI.l_size
 		AI.l_size += 1
 		var mas := min_array_sizes()
@@ -300,7 +299,7 @@ class AIAction extends AIProcessor:
 		AI.entity.mem[m_index] += t ** 30
 		if x_dir == 0 && y_dir == 0: AI.entity.xyvccelerate(Vector2.RIGHT.rotated(AI.entity.mem[m_index]))
 	
-	func static_mover(x_dir: float, y_dir: float) -> void: pass
+	func static_mover(_x_dir: float, _y_dir: float) -> void: pass
 #endregion####################################################################################################################################################################################
 	
 #regionActionTypeMethods######################################################################################################################################################################

@@ -2,7 +2,7 @@ extends Control
 
 func _ready() -> void:
 	Engine.max_fps = 60
-	call_deferred("load_game")
+	load_game.call_deferred()
 
 func load_game() -> void:
 	await get_tree().create_timer(0.5).timeout
@@ -15,5 +15,3 @@ func load_game() -> void:
 	#for i in range(50):
 		##curtain.color.a -= 0.02
 		#await get_tree().create_timer(0.01).timeout
-
-func _process(delta: float) -> void: pass

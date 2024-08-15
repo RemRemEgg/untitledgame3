@@ -1,9 +1,6 @@
 extends World
 
-func _ready() -> void:
-	pass
-
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	parallax()
 
 func _start_game() -> void:
@@ -11,4 +8,4 @@ func _start_game() -> void:
 	get_tree().change_scene_to_file("res://scenes/worlds/dungeon_root.tscn")
 
 func _start_game_hit(body) -> void:
-	if body is Player: call_deferred("_start_game")
+	if body is Player: _start_game.call_deferred()

@@ -40,7 +40,7 @@ func submit(text: String) -> void:
 	if (history.size() > 0 && history[0] != text) || history.size() == 0: history.push_front(text)
 
 func print(text: String) -> void:
-	print_rich("[Console] " + text.replace("\n", "\n[Console] "))
+	print_rich("[Console] " + text.replace("\n", "\n          "))
 	lines.text += ("\n" if lines.text != "" else "") + text
 
 func print_err(text: String) -> void:
@@ -54,9 +54,9 @@ func parse_command(text: String) -> void:
 		"clear": clear()
 		"say": self.print(" ".join(args.slice(1)))
 		"fps":
-			if args.size() < 2: return self.print("Current FPS target is %s (%s mspt), running at %s" % [Engine.max_fps,round(1000/Engine.max_fps),Engine.get_frames_per_second()])
+			if args.size() < 2: return self.print("Current FPS target is %s (%s mspt), running at %s" % [Engine.max_fps,round(1000.0/Engine.max_fps),Engine.get_frames_per_second()])
 			Engine.max_fps = int(args[1])
-			self.print("FPS target set to %s (%s mspt), running at %s" % [Engine.max_fps,round(1000/Engine.max_fps),Engine.get_frames_per_second()])
+			self.print("FPS target set to %s (%s mspt), running at %s" % [Engine.max_fps,round(1000.0/Engine.max_fps),Engine.get_frames_per_second()])
 		"ai":
 			if args.size() < 2: return print_err("Not enough arguments for command")
 			match args[1]:
@@ -82,9 +82,9 @@ func parse_command(text: String) -> void:
 					self.print("Force AI type set to %s" % ProcAI.move_names[Global.TEMP.FORCE_AI_TYPE])
 				_: print_err("Unknown Command '%s'" % args[1])
 		"eval":
-			var exp: Expression = Expression.new()
-			exp.parse(" ".join(args.slice(1)))
-			self.print(str(exp.execute()))
+			var expr: Expression = Expression.new()
+			expr.parse(" ".join(args.slice(1)))
+			self.print(str(expr.execute()))
 		"test":
 			self.print("%s" % ItemData.ids.ROCK)
 			self.print("%s" % ItemData.lookup(ItemData.ids.ROCK))
@@ -100,16 +100,16 @@ func split_in_same_level(text: String, blade: String) -> Array[String]:
 	var ret: Array[String] = []
 	var pos: int = 0
 	var dist: int = 0
-	var stack: Array[String]
+	var stack: Array[String] = []
 	while true:
 		if pos + dist >= text.length():
 			ret.append(text.substr(pos))
 			return ret
-		var char: String = text[pos + dist]
-		if char == "\\":
+		var chari: String = text[pos + dist]
+		if chari == "\\":
 			dist += 2
 			continue
-		if !stack.is_empty(): if stack[-1] == char: 
+		if !stack.is_empty(): if stack[-1] == chari: 
 			stack.pop_back()
 			dist += 1
 			continue
@@ -118,7 +118,7 @@ func split_in_same_level(text: String, blade: String) -> Array[String]:
 			pos += dist + 1
 			dist = 0
 		else:
-			match char:
+			match chari:
 				"[": stack.append("]")
 				"{": stack.append("}")
 				"(": stack.append(")")

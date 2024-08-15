@@ -18,6 +18,7 @@ script = ExtResource("1_gx0xf")
 
 [node name="loading_text" type="TextureRect" parent="."]
 material = SubResource("ShaderMaterial_vy1ff")
+layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 scale = Vector2(4, 4)

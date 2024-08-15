@@ -4,6 +4,8 @@ extends Control
 @onready var multiplayer_menu: Control = $margin/multiplayer as Control
 @onready var singleplayer_menu: Control = $margin/singleplayer as Control
 
+@onready var ip_input: LineEdit = $margin/multiplayer/vbox/ip_input as LineEdit
+
 func _ready() -> void: pass
 
 func move() -> void:
@@ -12,7 +14,14 @@ func move() -> void:
 
 # TODO setup savefiles
 func new_game() -> void:
-	get_tree().change_scene_to_file("res://scenes/worlds/overworld.tscn")
+	Server.start_server()
+	Server.to_overworld()
+	Server.add_player(1, true)
+	queue_free()
+
+# TODO add address validation & error handling
+func join_game() -> void:
+	Server.join_server(ip_input.text if !ip_input.text.is_empty() else "127.0.0.1")
 
 func to_singleplayer() -> void:
 	move()

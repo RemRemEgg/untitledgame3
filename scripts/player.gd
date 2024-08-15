@@ -1,16 +1,24 @@
 class_name Player
 extends Entity
 
+static var STATIC_SCENE := preload("res://scenes/player/player.tscn")
 static var DEATH_SCREEN := preload("res://scenes/ui/death_screen.tscn")
 
 @onready var camera: Camera2D = $camera as Camera2D
 @onready var hud: HUD = $camera/HUD as HUD
 
+@onready var tx_sync: MultiplayerSynchronizer = $tx_sync as MultiplayerSynchronizer
+@onready var rx_sync: MultiplayerSynchronizer = $rx_sync as MultiplayerSynchronizer
+@export var peer_uuid: int = -1
+var true_puppet_position: Vector2 = Vector2.ZERO
+
 var dash_time: float = 0.0
 var dash_dir: Vector2 = Vector2.ZERO
 var dash_power: float = 3.2
-var cyote: float = 0.0;
+var cyote: float = 0.0
+
 var jump_mem: float = 0.0
+var input_dir: float = 0.0
 
 # TODO weaponry
 var weapons: Array[PlayerItem] = [PlayerItem.from(ItemData.ids.SWORD), PlayerItem.from(ItemData.ids.ROCK)]
@@ -59,6 +67,7 @@ func respawn() -> void:
 	velocity = Vector2.ZERO
 	sprite.self_modulate = Color.WHITE
 	global_position = Vector2.ZERO
+	Global.WORLD.throw_player()
 	Global.WORLD.to_overworld()
 
 func get_feet_pos() -> Vector2: return global_position - Vector2(0.0, col_shape.height / 2.0)
@@ -67,9 +76,10 @@ var stairs_timer := 0.0
 var stairs_power := 0.0
 
 func _process(delta: float) -> void:
+	idelta = delta * 60.0
+	if Server.peer_uuid != self.peer_uuid: return puppet_process()
 	hud.update(self)
 	if death_time > 0.0: return death()
-	idelta = delta * 60.0
 	iof = is_on_floor()
 	jump_mem -= idelta
 	cyote -= idelta
@@ -79,7 +89,7 @@ func _process(delta: float) -> void:
 		using_time -= idelta
 		if using_time <= 0.0: done_using()
 	
-	var input_dir: float = Input.get_axis("left", "right")
+	input_dir = Input.get_axis("left", "right")
 	if input_dir:
 		sprite.flip_h = input_dir < 0
 		xccelerate(Global.fsign(input_dir))
@@ -119,6 +129,7 @@ func _process(delta: float) -> void:
 	
 	if dash_time < -30: velocity = dash_dir
 	move_and_slide()
+	true_puppet_position = position
 	if dash_time < -30: velocity = dash_dir / dash_power
 	
 	hurt_time -= idelta
@@ -127,7 +138,17 @@ func _process(delta: float) -> void:
 	
 	if using_item: use_item(weapons[0])
 
+func puppet_process() -> void:
+	var display_pos = position
+	position = true_puppet_position
+	apply_gravity(1.0)
+	xccelerate(Global.fsign(input_dir))
+	move_and_slide()
+	true_puppet_position = position
+	position = display_pos.lerp(true_puppet_position, 0.5)
+
 func _input(event: InputEvent) -> void:
+	if Server.peer_uuid != self.peer_uuid: return
 	if event is InputEventKey:
 		if Input.is_action_just_pressed("jump"): jump_mem = 10
 		if Input.is_action_just_pressed("dash") && dash_time >= 0.0:
@@ -193,7 +214,3 @@ class PlayerItem:
 				projectile = Projectile.new()
 		projectile.texture = ItemData.texture_lookup(data.reg_id)
 		projectile.damage = data.stats[ItemData.S_DAMAGE]
-
-
-
-

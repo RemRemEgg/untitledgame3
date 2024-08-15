@@ -3,9 +3,9 @@ extends Node
 static var DUNGEON_GEN_TEMP: Node2D
 static var GEN_STEP: int = 0
 
-static var PLAYER: Node2D
+static var MAIN_PLAYER: Player
 
-static var WORLD: Node2D
+static var WORLD: World
 
 # TODO remove dbg kill
 func _input(event: InputEvent) -> void:

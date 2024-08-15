@@ -49,7 +49,7 @@ const DEF_LAUNCH: Array[float]  = [20, 16, 10]
 class ids: enum {AIR, SWORD, ROCK, CHERRY}
 static func register_all() -> void:
 	var image: Image = Image.create_from_data(2, 2, false, Image.FORMAT_RGB8, [0,0,0,0xff,0,0xff,0xff,0,0xff,0,0,0])
-	image.resize(16, 16, 0)
+	image.resize(16, 16, Image.INTERPOLATE_NEAREST)
 	NULL_TEXTURE = ImageTexture.create_from_image(image)
 	if NULL_TEXTURE != null: Console.print("NULL_TEXTURE created")
 	Console.print("Loading items")
@@ -99,6 +99,6 @@ static func load_texture(path: String) -> ImageTexture:
 	if !FileAccess.file_exists(path):
 		Console.print_err("Failed to load texture '%s'" % path)
 		return NULL_TEXTURE
-	var texture := ImageTexture.create_from_image(Image.load_from_file(ProjectSettings.globalize_path(path)))
+	var ltexture := ImageTexture.create_from_image(Image.load_from_file(ProjectSettings.globalize_path(path)))
 	Console.print("Loading from disk: \"%s\"" % path)
-	return texture
+	return ltexture

@@ -54,7 +54,6 @@ theme_override_constants/margin_bottom = 12
 
 [node name="main" type="Control" parent="margin"]
 layout_mode = 2
-size_flags_horizontal = 4
 
 [node name="vbox" type="VBoxContainer" parent="margin/main"]
 layout_mode = 1
@@ -64,9 +63,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -130.0
-offset_top = -168.0
+offset_top = -131.0
 offset_right = 130.0
-offset_bottom = 168.0
+offset_bottom = 131.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
@@ -308,7 +307,7 @@ text = "multiplayer"
 [node name="ip_input" type="LineEdit" parent="margin/multiplayer/vbox"]
 layout_mode = 2
 theme = ExtResource("5_ef1u6")
-placeholder_text = "IP Address"
+placeholder_text = "127.0.0.1"
 
 [node name="join" type="TextureButton" parent="margin/multiplayer/vbox"]
 layout_mode = 2

@@ -20,13 +20,12 @@ var time: float = 0.0
 var max_time: float = 0.0   ###
 var pierce: int = 0   ###
 var kill_no_origin: bool = true   ###
-var terrain_active: bool = false   ###
 var readied: bool = false
 var damage: float = 0.0   ###
 
 func _to_string() -> String:
 	var sb := "Proj<%s> Mt: %s, p: %s, KNO: %s, col: %s%s%s" % [base.get_method(), max_time, pierce, kill_no_origin,\
-	friendly as int, hostile as int, terrain_active as int]
+	friendly as int, hostile as int, terrain as int]
 	return sb
 
 func fire(origin_: Entity, direction: Vector2) -> Projectile:
@@ -68,16 +67,16 @@ func solidify_from(other: Projectile) -> void:
 	
 	friendly = other.friendly
 	hostile = other.hostile
-	terrain_active = other.terrain_active
+	terrain = other.terrain
 	collision_layer = (Global.COLLISION.FRIENDLY_PROJ if friendly else 0x0) | (Global.COLLISION.HOSTILE_PROJ if hostile else 0x0)
-	collision_mask = Global.COLLISION.WORLD if terrain_active else 0x0
+	collision_mask = Global.COLLISION.WORLD if terrain else 0x0
 	hitbox.collision_layer = 0x0
 	hitbox.collision_mask = (Global.COLLISION.FRIENDLY_ENT if friendly else 0x0) | (Global.COLLISION.HOSTILE_ENT if hostile else 0x0)
 
-func set_collisions(hurt_friendly: bool, hurt_hostile: bool, terrain: bool) -> void:
+func set_collisions(hurt_friendly: bool, hurt_hostile: bool, terrain_active: bool) -> void:
 	friendly = hurt_friendly
 	hostile = hurt_hostile
-	terrain_active = terrain
+	terrain = terrain_active
 
 func _ready() -> void:
 	if !readied:
@@ -91,7 +90,7 @@ func _process(delta: float) -> void:
 	if time >= max_time: return kill()
 	if kill_no_origin && !is_instance_valid(origin): return kill()
 	idelta = delta
-	if terrain_active: iof = is_on_floor()
+	if terrain: iof = is_on_floor()
 	base.call()
 
 func _physics_process(_delta: float) -> void: pass

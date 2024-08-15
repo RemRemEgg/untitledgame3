@@ -10,11 +10,13 @@ extends Node2D
 
 func _ready() -> void: pass
 
-func _enter_tree() -> void: Global.WORLD = self as Node2D
+func _enter_tree() -> void: Global.WORLD = self
 
 func _process(_delta: float) -> void: pass
 
-func parallax() -> void: background.transform.origin = $players/player/camera.get_global_transform().origin * 0.4
+func parallax() -> void:
+	pass
+	#background.transform.origin = $players/player/camera.get_global_transform().origin * 0.4
 
 func throw_player() -> void:
 	var player: Player = get_node("players/player") as Player
@@ -27,6 +29,10 @@ func catch_player() -> Player:
 	Global.PLAYER = null
 	return player
 
-func to_overworld() -> void:
-	throw_player()
-	get_tree().change_scene_to_file("res://scenes/worlds/overworld.tscn")
+#func _on_player_spawned(player: Node) -> void:
+	#if player is Player:
+		#if player.peer_uuid == -1: player.peer_uuid = int(player.name.split("_", false, 1)[1])
+		#player.tx_sync.set_multiplayer_authority(player.peer_uuid)
+		#if player.peer_uuid == Server.peer_uuid:
+			#player.camera.enabled = true
+			#Global.MAIN_PLAYER = player

@@ -1,10 +1,9 @@
-[gd_scene load_steps=9 format=3 uid="uid://cs2e0jcki0iap"]
+[gd_scene load_steps=8 format=3 uid="uid://cs2e0jcki0iap"]
 
 [ext_resource type="Texture2D" uid="uid://bxs1frc7lrmxi" path="res://assets/textures/ui/background.png" id="1_enyah"]
 [ext_resource type="Script" path="res://scripts/overworld.gd" id="1_sgfeu"]
 [ext_resource type="Shader" path="res://assets/shaders/ground_tile.gdshader" id="3_2begb"]
 [ext_resource type="Texture2D" uid="uid://p6011eoldcgt" path="res://assets/textures/world/ground.png" id="4_yygnf"]
-[ext_resource type="PackedScene" uid="uid://dohjk3rx0rj3k" path="res://scenes/player/player.tscn" id="5_sivf3"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_d3qf7"]
 shader = ExtResource("3_2begb")
@@ -96,9 +95,6 @@ shape = SubResource("RectangleShape2D_ddxut")
 [node name="entities" type="Node2D" parent="."]
 
 [node name="players" type="Node2D" parent="."]
-
-[node name="player" parent="players" instance=ExtResource("5_sivf3")]
-position = Vector2(487, 0)
 
 [node name="projectiles" type="Node2D" parent="."]
 
