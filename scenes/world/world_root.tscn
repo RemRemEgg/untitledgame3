@@ -1,0 +1,30 @@
+[gd_scene load_steps=2 format=3 uid="uid://cs2e0jcki0iap"]
+
+[ext_resource type="Script" path="res://scripts/World.gd" id="1_13qhi"]
+
+[node name="world" type="Node2D"]
+script = ExtResource("1_13qhi")
+
+[node name="spawners" type="Node" parent="."]
+
+[node name="player_spawner" type="MultiplayerSpawner" parent="spawners"]
+spawn_path = NodePath("../../players")
+
+[node name="projectile_spawner" type="MultiplayerSpawner" parent="spawners"]
+spawn_path = NodePath("../../projectiles")
+
+[node name="entities_spawner" type="MultiplayerSpawner" parent="spawners"]
+spawn_path = NodePath("../../entities")
+
+[node name="popups_spawner" type="MultiplayerSpawner" parent="spawners"]
+spawn_path = NodePath("../../popups")
+
+[node name="terrain" type="Node2D" parent="."]
+
+[node name="entities" type="Node2D" parent="."]
+
+[node name="players" type="Node2D" parent="."]
+
+[node name="projectiles" type="Node2D" parent="."]
+
+[node name="popups" type="Node2D" parent="."]

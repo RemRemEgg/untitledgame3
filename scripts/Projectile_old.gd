@@ -3,7 +3,6 @@ extends CharacterBody2D
 
 const HALF_PI: float = PI/2.0
 const SNAP_ANGLE: float = PI / 8.0
-static var SCENE: PackedScene
 
 @onready var sprite: Sprite2D = $sprite
 @onready var collider: CollisionShape2D = $collider
@@ -26,7 +25,7 @@ var damage: float = 10.0
 
 
 static func create(mode: int) -> Projectile:
-	var proj = SCENE.instantiate()
+	var proj = Global.PROJECTILE_SCENE.instantiate()
 	proj.set_script(load("res://scripts/Projectile_old.gd"))
 	proj._ready()
 	proj.ai_mode = mode
@@ -83,14 +82,14 @@ func from_item(item: Item) -> Projectile_old:
 	sprite.texture = item.texture
 	lifetime = item.stats[0]
 	match item.use_type:
-		Item.SWING:
+		ProcItem.TYPE_SWING:
 			ai_mode = -1
 			var mouse: Vector2 = DisplayServer.mouse_get_position() - DisplayServer.screen_get_size() / 2
 			stats = [mouse.angle(), 0.0]
 			sprite.flip_v = stats[0] < -HALF_PI || HALF_PI < stats[0]
 			stats[1] = -1.6 if sprite.flip_v else 1.6
 			stats[0] -= stats[1] / 2.0
-		Item.CONSUME:
+		ProcItem.TYPE_CONSUME:
 			ai_mode = -2
 			lifetime = 60 * 1.5
 			velocity = DisplayServer.mouse_get_position() - DisplayServer.screen_get_size() / 2

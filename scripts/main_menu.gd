@@ -6,7 +6,26 @@ extends Control
 
 @onready var ip_input: LineEdit = $margin/multiplayer/vbox/ip_input as LineEdit
 
-func _ready() -> void: pass
+func _ready() -> void:
+	Console.load_status = -1
+	if Console.active:
+		Console.toggle()
+		#dbg_auto_join()
+
+func dbg_auto_join() -> void:
+	Server.peer = ENetMultiplayerPeer.new()
+	var error: Error = Server.peer.create_server(15973)
+	Server.peer.close()
+	Server.peer = null
+	if error:
+		get_window().position.x += 480
+		await get_tree().create_timer(0.2).timeout
+		join_game()
+	else:
+		get_window().position.x -= 480
+		new_game()
+
+func _process(_delta: float) -> void: return
 
 func move() -> void:
 	main_menu.visible = false
@@ -15,8 +34,7 @@ func move() -> void:
 # TODO setup savefiles
 func new_game() -> void:
 	Server.start_server()
-	Server.to_overworld()
-	Server.add_player(1, true)
+	Server.request_join_game(Player.get_seralized_inventory())
 	queue_free()
 
 # TODO add address validation & error handling

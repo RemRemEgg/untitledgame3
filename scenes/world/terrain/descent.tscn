@@ -1,0 +1,53 @@
+[gd_scene load_steps=7 format=3 uid="uid://dobnmlawf0fb4"]
+
+[ext_resource type="Script" path="res://scripts/descent.gd" id="1_pbn88"]
+[ext_resource type="Shader" path="res://assets/shaders/ground_tile.gdshader" id="2_5jkd4"]
+[ext_resource type="Texture2D" uid="uid://p6011eoldcgt" path="res://assets/textures/world/ground.png" id="3_5m1lu"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4coy1"]
+shader = ExtResource("2_5jkd4")
+shader_parameter/MOD = Vector4(1, 1, 1, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qibhs"]
+size = Vector2(16, 16)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_abchm"]
+shader = ExtResource("2_5jkd4")
+shader_parameter/MOD = Vector4(0.5, 0.52, 0.7, 1)
+
+[node name="terrain" type="Node2D"]
+script = ExtResource("1_pbn88")
+
+[node name="terrain_loop" type="Node2D" parent="."]
+
+[node name="r" type="StaticBody2D" parent="terrain_loop"]
+position = Vector2(832, 256)
+scale = Vector2(100, 70)
+collision_layer = 51
+collision_mask = 0
+
+[node name="Sprite2D3" type="Sprite2D" parent="terrain_loop/r"]
+material = SubResource("ShaderMaterial_4coy1")
+texture = ExtResource("3_5m1lu")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="terrain_loop/r"]
+shape = SubResource("RectangleShape2D_qibhs")
+
+[node name="l" type="StaticBody2D" parent="terrain_loop"]
+position = Vector2(-832, 256)
+scale = Vector2(100, 70)
+collision_layer = 51
+collision_mask = 0
+
+[node name="Sprite2D3" type="Sprite2D" parent="terrain_loop/l"]
+material = SubResource("ShaderMaterial_4coy1")
+texture = ExtResource("3_5m1lu")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="terrain_loop/l"]
+shape = SubResource("RectangleShape2D_qibhs")
+
+[node name="tube_bg" type="Sprite2D" parent="terrain_loop"]
+material = SubResource("ShaderMaterial_abchm")
+position = Vector2(0, 256)
+scale = Vector2(4, 70)
+texture = ExtResource("3_5m1lu")

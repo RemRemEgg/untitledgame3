@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_onugq"]
 [ext_resource type="Texture2D" uid="uid://b784vapcdbjkq" path="res://assets/textures/player/player.png" id="2_ccsth"]
 [ext_resource type="PackedScene" uid="uid://bkb344rfhejjb" path="res://scenes/ui/hud.tscn" id="3_k6lh3"]
+[ext_resource type="Script" path="res://scripts/camera.gd" id="3_yiuvm"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_3u5vl"]
 radius = 6.0
@@ -21,16 +22,11 @@ properties/2/replication_mode = 1
 properties/3/path = NodePath(".:true_puppet_position")
 properties/3/spawn = true
 properties/3/replication_mode = 1
+properties/4/path = NodePath(".:hurt_time")
+properties/4/spawn = true
+properties/4/replication_mode = 2
 
-[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_fns50"]
-properties/0/path = NodePath(".:friction")
-properties/0/spawn = true
-properties/0/replication_mode = 1
-properties/1/path = NodePath(".:peer_uuid")
-properties/1/spawn = true
-properties/1/replication_mode = 1
-
-[node name="player" type="CharacterBody2D"]
+[node name="player" type="CharacterBody2D" groups=["players"]]
 collision_layer = 0
 collision_mask = 0
 script = ExtResource("1_onugq")
@@ -44,18 +40,15 @@ texture = ExtResource("2_ccsth")
 
 [node name="camera" type="Camera2D" parent="."]
 enabled = false
-position_smoothing_enabled = true
 position_smoothing_speed = 16.0
 drag_left_margin = 0.01
 drag_top_margin = 0.01
 drag_right_margin = 0.01
 drag_bottom_margin = 0.01
+script = ExtResource("3_yiuvm")
 
 [node name="HUD" parent="camera" instance=ExtResource("3_k6lh3")]
 
 [node name="tx_sync" type="MultiplayerSynchronizer" parent="."]
 delta_interval = 0.5
 replication_config = SubResource("SceneReplicationConfig_3int5")
-
-[node name="rx_sync" type="MultiplayerSynchronizer" parent="."]
-replication_config = SubResource("SceneReplicationConfig_fns50")

@@ -1,4 +1,5 @@
-class_name ProcAI
+class_name ProcEnt
+
 
 var entity: Entity
 var mas: bool = false
@@ -13,6 +14,35 @@ class MOVE_TYPE: enum {LAND, AIR, GROUND, ALL, STATIC}
 const move_names: Array[String] = ["land", "air", "ground", "all", "static"]
 var move_type: int = 0
 var mod_color: Color = Color.WHITE
+var static_index: int = 0
+
+static var TEMP_CONST_PROCAI: ProcEnt
+static var AIS: Array[ProcEnt] = []
+static var AI_STEP = -1
+static var RAND := true
+
+static var ent_count: int = 0
+static func spawn_random_enemy() -> Entity:
+	Server.next_enemy = Global.ENTITY_SCENE.instantiate() as Entity
+	Server.next_enemy.friendly = false
+	Server.next_enemy.name = str(ent_count)
+	ent_count += 1
+	AI_STEP += 1
+	if AIS.size() == 0: return
+	AIS[randi_range(0, clamp(AIS.size()-1, 0, int(AI_STEP / 3.0)))].register_entity(Server.next_enemy)
+	var sd_arr: Array[int] = Server.mp_spawn_data.to_array(Server.next_enemy)
+	Global.WORLD.entity_spawner.spawn(sd_arr)
+	return Server.next_enemy
+	#if RAND:
+		#AI_STEP += 1
+		#if AIS.size() == 0 || AI_STEP % int(AIS.size()**1.6) == 0:
+			#var n := ProcEnt.generate_new()
+			#AIS.append(n)
+			#n.register_entity(Server.next_enemy)
+		#else: AIS.pick_random().register_entity(Server.next_enemy)
+	#else: TEMP_CONST_PROCAI.register_entity(Server.next_enemy)
+	#Server.sync_entity_ais()
+
 
 func process(entity_: Entity) -> void:
 	entity = entity_
@@ -21,6 +51,7 @@ func process(entity_: Entity) -> void:
 		if entity.lock_timer + entity.idelta > 0.0: entity.was_attack_locked = entity.is_attack_locked
 		entity.is_attack_locked = false
 	update_target()
+	if entity.target == null: return
 	
 	target_vector = entity.target.global_position - entity.global_position
 	target_foot_vector = entity.target.get_feet_pos() - entity.get_feet_pos()
@@ -29,10 +60,24 @@ func process(entity_: Entity) -> void:
 	root.root_call(self)
 	if mas: entity.move_and_slide()
 
-func update_target() -> void: entity.target = entity.get_tree().root.get_node("world/players/player") as Entity
+func update_target() -> void:
+	var min_dist: float = INF
+	var target: Entity = null
+	for t_ent in Global.WORLD.PLAYERS.get_children():
+		if !t_ent is Entity: continue
+		if (t_ent.hostile && entity.friendly) || (t_ent.friendly && entity.hostile):
+			var ds := entity.global_position.distance_squared_to(t_ent.global_position)
+			if ds < min_dist:
+				min_dist = ds
+				target = t_ent
+	entity.target = target
 
-static func generate_new() -> ProcAI:
-	var ai: ProcAI = ProcAI.new()
+func register() -> void:
+	AIS.append(self)
+	self.root.register()
+
+static func generate_new() -> ProcEnt:
+	var ai: ProcEnt = ProcEnt.new()
 	ai.move_type = Global.TEMP.FORCE_AI_TYPE if Global.TEMP.FORCE_AI_TYPE != -1 else randi_range(MOVE_TYPE.LAND, MOVE_TYPE.ALL)
 	
 	var rootfw := AIFramework.generate_new()
@@ -45,9 +90,11 @@ static func generate_new() -> ProcAI:
 	
 	ai.mod_color = Color.from_hsv(randf(), 0.5 + (randf() * 0.3), 1, 1)
 	
+	ai.static_index = AIS.size()
+	
 	return ai
 
-func register_entity(ent: Entity):
+func register_entity(ent: Entity) -> void:
 	ent.proc_ai = self
 	ent.locks.clear()
 	ent.mem.clear()
@@ -56,7 +103,8 @@ func register_entity(ent: Entity):
 	ent.mem.resize(0)
 	ent.mem.append_array(init_mem)
 	
-	ent.sprite.texture = ItemData.load_texture("res://assets/textures/mobs/type_%s.png" % move_names[move_type]) as Texture2D
+	ent.sprite = ent.get_node("sprite")
+	ent.sprite.texture = ProcItem.load_texture("res://assets/textures/mobs/type_%s.png" % move_names[move_type]) as Texture2D
 	
 	ent.collision_layer = Global.COLLISION.HOSTILE_ENT
 	match move_type:
@@ -64,7 +112,7 @@ func register_entity(ent: Entity):
 
 func _to_string() -> String:
 	var sb := "[color=#aea]ProcAI<%s> iM: %s[/color]" % [move_names[move_type], init_mem]
-	sb += "\n  " + root.to_string().replace("\n", "\n  ")
+	if Server.is_host: sb += "\n  " + root.to_string().replace("\n", "\n  ")
 	return sb
 
 var root: AIFramework
@@ -74,7 +122,7 @@ class AIProcessor:
 	func finalize() -> AIProcessor: return self
 
 class AIFramework extends AIProcessor:
-	static var AI: ProcAI
+	static var AI: ProcEnt
 ##framework add############################################################
 	enum {DEADWEIGHT, DISTANCE_2, DISTANCE_3, CYCLE, RANDOM, ENTITY_HEALTH, TARGET_HEALTH, WAS_ATTACK_LOCKED}
 	var type: int
@@ -121,7 +169,7 @@ class AIFramework extends AIProcessor:
 			TARGET_HEALTH: return Vector2i(2, 1)
 			WAS_ATTACK_LOCKED: return Vector2i(2, 0)
 			_: return Vector2i(0, 0)
-	func root_call(ai: ProcAI) -> void:
+	func root_call(ai: ProcEnt) -> void:
 		AIFramework.AI = ai
 		AIAction.AI = ai
 		process.call()
@@ -156,6 +204,11 @@ class AIFramework extends AIProcessor:
 				fw.actions.append(naia)
 		
 		return fw
+		
+	func register() -> void:
+		for action in actions:
+			if action is AIAction: action.register()
+			if action is AIFramework: action.register()
 	
 #regionFrameworkTypeMethods###################################################################################################################################################################
 ##############################################################################################################################################################################################
@@ -210,7 +263,7 @@ class AIFramework extends AIProcessor:
 
 class AIAction extends AIProcessor:
 	static var DEADWEIGHT_ACTION: AIAction = AIAction.new().set_type(DEADWEIGHT).finalize()
-	static var AI: ProcAI
+	static var AI: ProcEnt
 ##action add###############################################################
 	enum {DEADWEIGHT, APPROACH_AND_MELEE, ALIGN_AND_RANGE, ALIGN_AND_POUNCE, ALIGN_AND_CHARGE, LURE_AND_MELEE}
 	var type: int = DEADWEIGHT
@@ -255,6 +308,8 @@ class AIAction extends AIProcessor:
 		var ac := AIAction.new()
 		ac.type = randi_range(APPROACH_AND_MELEE, LURE_AND_MELEE)
 		return ac
+	
+	func register() -> void: attack.register()
 
 #regionMoverTypes#############################################################################################################################################################################
 	func movement_branch(x_dir: float, y_dir: int) -> void:
@@ -392,31 +447,48 @@ class AIAction extends AIProcessor:
 		return sb
 
 class Attack:
-	var projectiles: Array[Projectile] = []
+	var projectiles: Array[ProcProj] = []
+	var indicies: Array[int] = []
+	var damage: float = 10
 	
 	static func from_action(action: AIAction) -> Attack:
 		var attack: Attack = Attack.new()
 		match action.type:
 			AIAction.APPROACH_AND_MELEE, AIAction.ALIGN_AND_POUNCE, AIAction.ALIGN_AND_CHARGE, AIAction.LURE_AND_MELEE:
-				var proj := Projectile.new()
-				proj.base_type = Projectile.bases.SWING
+				#var proj := Projectile.new()
+				##proj.base_type = Projectile.bases.SWING
+				#proj.max_time = 20
+				#proj.pierce = -1
+				#proj.texture = ImageTexture.create_from_image(Image.load_from_file(ProjectSettings.globalize_path("res://assets/textures/mobs/golem_fist.png")))
+				#proj.set_collisions(true, false, false)
+				#proj.damage = 10
+				#attack.projectiles.push_back(proj)
+				var proj := ProcProj.new()
+				proj.base_type = ProcProj.bases.SWING
 				proj.max_time = 20
 				proj.pierce = -1
-				proj.texture = ImageTexture.create_from_image(Image.load_from_file(ProjectSettings.globalize_path("res://assets/textures/mobs/golem_fist.png")))
-				proj.set_collisions(true, false, false)
-				proj.damage = 10
+				proj.terrain_active = false
+				attack.damage = 10
 				attack.projectiles.push_back(proj)
 			AIAction.ALIGN_AND_RANGE:
-				var proj := Projectile.new()
-				proj.base_type = Projectile.bases.ARROW
+				var proj := ProcProj.new()
+				proj.base_type = ProcProj.bases.ARROW
 				proj.max_time = 60
-				proj.speed *= 2.4
-				proj.friction = 0.1
-				proj.air_friction = 0.0
-				proj.texture = ItemData.texture_lookup(ItemData.ids.ROCK)
-				proj.set_collisions(true, false, true)
-				proj.damage = 7
+				proj.terrain_active = true
+				proj.kill_no_origin = false
+				attack.damage = 7
 				attack.projectiles.push_back(proj)
 		return attack
 	
-	func fire(ai: ProcAI, dir: Vector2) -> void: for proj in projectiles: proj.fire(ai.entity, dir).add_to_world()
+	func register() -> void:
+		indicies.resize(projectiles.size())
+		for i in range(projectiles.size()):
+			projectiles[i].finalize()
+			projectiles[i].static_index = ProcProj.AIS.size()
+			indicies[i] = projectiles[i].static_index
+			ProcProj.AIS.append(projectiles[i])
+		projectiles.clear()
+	
+	func fire(ai: ProcEnt, dir: Vector2) -> void:
+		for i in indicies:
+			ProcProj.AIS[i].fire(ai.entity, dir, damage)
