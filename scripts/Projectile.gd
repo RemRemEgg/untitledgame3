@@ -2,149 +2,43 @@ class_name Projectile
 extends CustomPhysicsObject
 
 static var SCENE: PackedScene = preload("res://scenes/world/projectile.tscn")
-func none() -> void: pass
 
 @onready var collider: CollisionShape2D = $collider as CollisionShape2D
 @onready var sprite: Sprite2D = $sprite as Sprite2D
 @onready var hitbox: Area2D = $hitbox as Area2D
 @onready var hitbox_collider: CollisionShape2D = $hitbox/collider as CollisionShape2D
 
-var initalizer: Callable = kill
-var base: Callable = kill
-var base_type: int = 0   ###
+var proc_proj: ProcProj
 var origin: Entity
-var mem: Array[float] = []
-var texture: ImageTexture   ###
-
+var mem: Array[float] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 var time: float = 0.0
-var max_time: float = 0.0   ###
 var pierce: int = 0   ###
-var kill_no_origin: bool = true   ###
-var terrain_active: bool = false   ###
+
 var readied: bool = false
-var damage: float = 0.0   ###
+var damage: float = 1.0   ###
 
 func _to_string() -> String:
-	var sb := "Proj<%s> Mt: %s, p: %s, KNO: %s, col: %s%s%s" % [base.get_method(), max_time, pierce, kill_no_origin,\
-	friendly as int, hostile as int, terrain_active as int]
+	var sb := "Proj<%s> Mt: %s, p: %s, KNO: %s, col: %s%s%s" % [proc_proj.base.get_method(), proc_proj.max_time, pierce, proc_proj.kill_no_origin,\
+	friendly as int, hostile as int, terrain as int]
 	return sb
-
-func fire(origin_: Entity, direction: Vector2) -> Projectile:
-	var cproj := SCENE.instantiate()
-	cproj.set_script(Projectile)
-	var proj: Projectile = cproj as Projectile
-	
-	proj.origin = origin_
-	proj.velocity = direction
-	proj._ready()
-	proj.solidify_from(self)
-	proj.initalizer.call()
-	return proj
-	
-func add_to_world() -> void:
-	var parent: Node = get_parent()
-	if parent: parent.remove_child(self)
-	sprite.texture = texture
-	Global.WORLD.PROJECTILES.add_child(self)
-
-func solidify_from(other: Projectile) -> void:
-	base_type = other.base_type
-	base = base_to_callable()
-	initalizer = base_to_init_callable()
-	mem.resize(0)
-	mem.append_array(other.mem)
-	texture = other.texture
-	
-	time = other.time
-	max_time = other.max_time
-	pierce = other.pierce
-	kill_no_origin = other.kill_no_origin
-	friction = other.friction
-	air_friction = other.air_friction
-	speed = other.speed
-	acceleration = other.acceleration
-	gravity = other.gravity
-	damage = other.damage
-	
-	friendly = other.friendly
-	hostile = other.hostile
-	terrain_active = other.terrain_active
-	collision_layer = (Global.COLLISION.FRIENDLY_PROJ if friendly else 0x0) | (Global.COLLISION.HOSTILE_PROJ if hostile else 0x0)
-	collision_mask = Global.COLLISION.WORLD if terrain_active else 0x0
-	hitbox.collision_layer = 0x0
-	hitbox.collision_mask = (Global.COLLISION.FRIENDLY_ENT if friendly else 0x0) | (Global.COLLISION.HOSTILE_ENT if hostile else 0x0)
-
-func set_collisions(hurt_friendly: bool, hurt_hostile: bool, terrain: bool) -> void:
-	friendly = hurt_friendly
-	hostile = hurt_hostile
-	terrain_active = terrain
 
 func _ready() -> void:
 	if !readied:
 		readied = true
 		hitbox_collider.shape = collider.shape
 		hitbox.body_shape_entered.connect(collide_with_body)
+	collision_layer = (Global.COLLISION.FRIENDLY_ENT if friendly else 0x0) | (Global.COLLISION.HOSTILE_ENT if hostile else 0x0)
+	collision_mask = Global.COLLISION.WORLD if terrain else 0x0
+	hitbox.collision_layer = (Global.COLLISION.FRIENDLY_ENT if friendly else 0x0) | (Global.COLLISION.HOSTILE_ENT if hostile else 0x0)
+	hitbox.collision_mask = (Global.COLLISION.FRIENDLY_ENT if hostile else 0x0) | (Global.COLLISION.HOSTILE_ENT if friendly else 0x0)
 
 func _process(delta: float) -> void:
-	delta *= 60
-	time += delta
-	if time >= max_time: return kill()
-	if kill_no_origin && !is_instance_valid(origin): return kill()
-	idelta = delta
-	if terrain_active: iof = is_on_floor()
-	base.call()
+	idelta = delta * 60
+	if !Server.is_host: return
+	proc_proj.process(self)
+	if terrain: iof = is_on_floor()
 
 func _physics_process(_delta: float) -> void: pass
 
 func collide_with_body(body_rid: RID, body: Node2D, _bsi: int, _lsi: int) -> void:
-	if hitbox.collision_mask == 0: return
-	var has_origin := is_instance_valid(origin)
-	if kill_no_origin && !has_origin: return kill()
-	if has_origin && origin.get_rid() == body_rid: return
-	if body is Entity: (body as Entity).take_damage(generate_damage_event())
-	pierce -= 1
-	if pierce == -1: kill()
-
-func generate_damage_event() -> DamageEvent:
-	var dmg: DamageEvent = DamageEvent.create(self.damage)
-	return dmg
-
-func kill() -> void:
-	queue_free()
-	hitbox.collision_mask = 0x0
-	hitbox.collision_layer = 0x0
-
-class bases: enum {SWING, ARROW}
-func base_to_callable() -> Callable:
-	match base_type:
-		bases.SWING: return swing
-		bases.ARROW: return arrow
-	return none
-func base_to_init_callable() -> Callable:
-	match base_type:
-		bases.SWING: return swing_initalizer
-		bases.ARROW: return arrow_initalizer
-	return none
-
-#region base functions
-
-func swing_initalizer() -> void:
-	mem = [velocity.angle(), 0.0]
-	sprite.flip_v = mem[0] < -PI/2 || PI/2 < mem[0]
-	mem[1] = -1.6 if sprite.flip_v else 1.6
-	mem[0] -= mem[1] / 2.0
-	idelta = 0.0
-	swing()
-func swing() -> void:
-	var angle: float = time * mem[1] / max_time + mem[0]
-	transform = Transform2D(angle, origin.global_position + Vector2.from_angle(angle) * 14)
-
-func arrow_initalizer() -> void:
-	velocity = velocity.normalized() * speed
-	transform = origin.global_transform
-func arrow() -> void:
-	apply_gravity((time/max_time + 0.5)**2)
-	move_and_slide()
-	if iof: velocity = velocity.move_toward(Vector2.ZERO, idelta*32)
-
-#endregion##########################################################################################
+	proc_proj.collide_with_body(self, body, body_rid)

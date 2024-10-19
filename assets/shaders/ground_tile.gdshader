@@ -1,6 +1,7 @@
 shader_type canvas_item;
 
 varying vec2 pos;
+uniform vec4 MOD = vec4(1.0, 1.0, 1.0, 1.0);
 
 void vertex() {
 	pos = UV;
@@ -11,7 +12,10 @@ void vertex() {
 
 void fragment() {
 	vec2 npos;
+	
 	npos.x = float(int(pos.x * 16.0) % 16) / 16.0;
 	npos.y = float(int(pos.y * 16.0) % 8) / 16.0 + .28 + sign(pos.y - .5) * .225;
-	COLOR = texture(TEXTURE, npos);
+	npos.x += float((int(pos.y * npos.y + npos.x) % 16) * 177) / 7.0;
+	npos.x = float(int(npos.x * 16.0) % 16) / 16.0;
+	COLOR = texture(TEXTURE, npos) * MOD;
 }

@@ -1,25 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://dxiij3r0j4fbp"]
-
-[ext_resource type="Script" path="res://scripts/startup.gd" id="1_gx0xf"]
-[ext_resource type="Shader" path="res://assets/shaders/slow_glitch.gdshader" id="1_ikira"]
-[ext_resource type="Texture2D" uid="uid://d15xv4nnym4c3" path="res://assets/textures/ui/loading.png" id="2_gnjff"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_vy1ff"]
-shader = ExtResource("1_ikira")
+[gd_scene format=3 uid="uid://dxiij3r0j4fbp"]
 
 [node name="startup" type="Control"]
+z_index = 110
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_gx0xf")
-
-[node name="loading_text" type="TextureRect" parent="."]
-material = SubResource("ShaderMaterial_vy1ff")
-offset_right = 40.0
-offset_bottom = 40.0
-scale = Vector2(4, 4)
-texture = ExtResource("2_gnjff")
-stretch_mode = 2

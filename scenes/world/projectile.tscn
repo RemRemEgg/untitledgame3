@@ -1,15 +1,28 @@
-[gd_scene load_steps=3 format=3 uid="uid://d01df5an22kpe"]
+[gd_scene load_steps=5 format=3 uid="uid://d01df5an22kpe"]
 
+[ext_resource type="Script" path="res://scripts/Projectile.gd" id="1_wvmt6"]
 [ext_resource type="Texture2D" uid="uid://c3ktgeiagjnwj" path="res://assets/textures/item/cherry.png" id="2_r2g1p"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ux57g"]
 size = Vector2(14, 14)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_hneoa"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath("sprite:flip_v")
+properties/2/spawn = true
+properties/2/replication_mode = 1
 
 [node name="Projectile" type="CharacterBody2D"]
 process_priority = 100
 process_physics_priority = 100
 collision_layer = 0
 collision_mask = 0
+script = ExtResource("1_wvmt6")
 
 [node name="collider" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_ux57g")
@@ -25,3 +38,6 @@ monitorable = false
 
 [node name="collider" type="CollisionShape2D" parent="hitbox"]
 debug_color = Color(0, 0.701961, 0.0117647, 0.419608)
+
+[node name="sync" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_hneoa")

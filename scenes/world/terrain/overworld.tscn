@@ -1,0 +1,163 @@
+[gd_scene load_steps=12 format=3 uid="uid://d3ajye4of16ah"]
+
+[ext_resource type="Script" path="res://scripts/overworld.gd" id="1_finie"]
+[ext_resource type="Shader" path="res://assets/shaders/ground_tile.gdshader" id="1_kkl6s"]
+[ext_resource type="Texture2D" uid="uid://p6011eoldcgt" path="res://assets/textures/world/ground.png" id="2_c3x6j"]
+[ext_resource type="Texture2D" uid="uid://bxs1frc7lrmxi" path="res://assets/textures/ui/background.png" id="2_j07ch"]
+[ext_resource type="Script" path="res://scripts/background.gd" id="3_7csoj"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tqdbc"]
+shader = ExtResource("1_kkl6s")
+shader_parameter/MOD = Vector4(0.5, 0.52, 0.7, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4coy1"]
+shader = ExtResource("1_kkl6s")
+shader_parameter/MOD = Vector4(1, 1, 1, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qibhs"]
+size = Vector2(16, 16)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1s1k3"]
+shader = ExtResource("1_kkl6s")
+shader_parameter/MOD = Vector4(1, 1, 1, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ydhtc"]
+size = Vector2(16, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mpbke"]
+size = Vector2(324, 94)
+
+[node name="terrain" type="Node2D"]
+script = ExtResource("1_finie")
+
+[node name="background" type="Sprite2D" parent="."]
+position = Vector2(-219, -131)
+scale = Vector2(6.88867, 6.88867)
+texture = ExtResource("2_j07ch")
+script = ExtResource("3_7csoj")
+parallax = 0.5
+
+[node name="tube_bg" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_tqdbc")
+position = Vector2(808, 4364)
+scale = Vector2(32, 550)
+texture = ExtResource("2_c3x6j")
+
+[node name="main" type="StaticBody2D" parent="."]
+position = Vector2(-266, 748)
+scale = Vector2(136, 92)
+collision_layer = 51
+collision_mask = 0
+
+[node name="Sprite2D3" type="Sprite2D" parent="main"]
+material = SubResource("ShaderMaterial_4coy1")
+texture = ExtResource("2_c3x6j")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="main"]
+shape = SubResource("RectangleShape2D_qibhs")
+
+[node name="drop_block" type="StaticBody2D" parent="."]
+position = Vector2(854, 564)
+scale = Vector2(4, 69)
+collision_layer = 51
+collision_mask = 0
+
+[node name="Sprite2D3" type="Sprite2D" parent="drop_block"]
+material = SubResource("ShaderMaterial_1s1k3")
+texture = ExtResource("2_c3x6j")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="drop_block"]
+shape = SubResource("RectangleShape2D_ydhtc")
+
+[node name="main5" type="StaticBody2D" parent="."]
+position = Vector2(1249, -97)
+rotation = 3.14159
+scale = Vector2(92, 8)
+collision_layer = 51
+collision_mask = 0
+
+[node name="Sprite2D3" type="Sprite2D" parent="main5"]
+material = SubResource("ShaderMaterial_4coy1")
+texture = ExtResource("2_c3x6j")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="main5"]
+shape = SubResource("RectangleShape2D_qibhs")
+
+[node name="main6" type="StaticBody2D" parent="."]
+position = Vector2(1430, 466)
+scale = Vector2(68, 128)
+collision_layer = 51
+collision_mask = 0
+
+[node name="Sprite2D3" type="Sprite2D" parent="main6"]
+material = SubResource("ShaderMaterial_4coy1")
+texture = ExtResource("2_c3x6j")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="main6"]
+shape = SubResource("RectangleShape2D_qibhs")
+
+[node name="main4" type="StaticBody2D" parent="."]
+position = Vector2(1433, -1526)
+rotation = -1.5708
+scale = Vector2(186, 115)
+collision_layer = 51
+collision_mask = 0
+
+[node name="Sprite2D3" type="Sprite2D" parent="main4"]
+material = SubResource("ShaderMaterial_4coy1")
+texture = ExtResource("2_c3x6j")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="main4"]
+shape = SubResource("RectangleShape2D_qibhs")
+
+[node name="main3" type="StaticBody2D" parent="."]
+position = Vector2(-1434, -116)
+rotation = 1.5708
+scale = Vector2(200, 60)
+collision_layer = 51
+collision_mask = 0
+
+[node name="Sprite2D3" type="Sprite2D" parent="main3"]
+material = SubResource("ShaderMaterial_4coy1")
+texture = ExtResource("2_c3x6j")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="main3"]
+shape = SubResource("RectangleShape2D_qibhs")
+
+[node name="main2" type="StaticBody2D" parent="."]
+position = Vector2(-991, 49.9999)
+rotation = 0.785397
+scale = Vector2(42, 46)
+collision_layer = 51
+collision_mask = 0
+
+[node name="Sprite2D3" type="Sprite2D" parent="main2"]
+material = SubResource("ShaderMaterial_4coy1")
+texture = ExtResource("2_c3x6j")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="main2"]
+shape = SubResource("RectangleShape2D_qibhs")
+
+[node name="drop_area" type="Area2D" parent="."]
+position = Vector2(875, -10)
+scale = Vector2(0.19, 0.5)
+collision_layer = 0
+collision_mask = 512
+input_pickable = false
+monitorable = false
+
+[node name="collider" type="CollisionShape2D" parent="drop_area"]
+shape = SubResource("RectangleShape2D_mpbke")
+
+[node name="start_game_area" type="Area2D" parent="."]
+position = Vector2(854, 1344)
+scale = Vector2(0.2, 2)
+collision_layer = 0
+collision_mask = 512
+input_pickable = false
+monitorable = false
+
+[node name="collider" type="CollisionShape2D" parent="start_game_area"]
+shape = SubResource("RectangleShape2D_mpbke")
+
+[connection signal="body_entered" from="start_game_area" to="." method="_start_game_hit"]

@@ -1,11 +1,40 @@
 extends CanvasLayer
 
-@onready var lines: RichTextLabel = $margin/vbox/lines as RichTextLabel
-@onready var input: LineEdit = $margin/vbox/input as LineEdit
+@onready var lines: RichTextLabel
+@onready var input: LineEdit
 
 var active: bool = true
-var history: Array[String] = []
+var history: Array[String]
 var h_index = -1
+var load_status: int = 0
+var load_call: Callable
+
+func _ready() -> void:
+	lines = $margin/vbox/lines as RichTextLabel
+	input = $margin/vbox/input as LineEdit
+	history = []
+	input.text_submitted.connect(submit)
+
+func _process(_delta: float) -> void:
+	if load_status % 3 == 1:
+		load_call.call_deferred()
+		load_status += 1
+	if load_status % 3 == 2: return
+	match load_status:
+		0: attempt_load(Global.load_resources, "Loading Global Resources")
+		3: attempt_load(Server.load_resources, "Loading Server Resources")
+		6: attempt_load(ProcItem.register_all, "Loading Static Items")
+		9: attempt_load(self.cleanup, "Loading R.E.M. Core")
+		12: attempt_load(func(): get_tree().change_scene_to_file.call_deferred("res://scenes/ui/main_menu.tscn"), "Starting Main Menu...")
+
+func attempt_load(load_step: Callable, load_id: String) -> void:
+	Console.print(load_id)
+	load_call = load_step
+	load_status += 1
+
+func cleanup() -> void:
+	Console.print("Finalizing")
+	load_status += 1
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey && event.is_pressed():
@@ -20,6 +49,7 @@ func _input(event: InputEvent) -> void:
 			if h_index != -1: input.insert_text_at_caret(history[h_index])
 
 func toggle() -> void:
+	if load_status != -1 && active == true: return
 	active = !active
 	visible = active
 	set_process(active)
@@ -29,10 +59,6 @@ func toggle() -> void:
 
 func clear() -> void: lines.text = ""
 
-func _ready() -> void:
-	toggle()
-	input.text_submitted.connect(submit)
-
 func submit(text: String) -> void:
 	input.text = ""
 	parse_command(text)
@@ -40,76 +66,84 @@ func submit(text: String) -> void:
 	if (history.size() > 0 && history[0] != text) || history.size() == 0: history.push_front(text)
 
 func print(text: String) -> void:
-	print_rich("[Console] " + text.replace("\n", "\n[Console] "))
+	print_rich("[Console] " + text.replace("\n", "\n          "))
 	lines.text += ("\n" if lines.text != "" else "") + text
 
 func print_err(text: String) -> void:
-	print_rich("[Error] " + text.replace("\n", "\n[Error] "))
+	print_rich("[color=red][Error] " + text.replace("\n", "\n[Error] ") + "[/color]")
+	push_error("[Error] " + text.replace("\n", "\n[Error] "))
 	lines.text += ("\n" if lines.text != "" else "") + "[color=red]" + text + "[/color]"
 
 func parse_command(text: String) -> void:
 	var args: Array[String] = split_in_same_level(text, " ")
+	self.print("< " + text)
 	
 	match args[0]:
 		"clear": clear()
 		"say": self.print(" ".join(args.slice(1)))
 		"fps":
-			if args.size() < 2: return self.print("Current FPS target is %s (%s mspt), running at %s" % [Engine.max_fps,round(1000/Engine.max_fps),Engine.get_frames_per_second()])
+			if args.size() < 2: return self.print(" > Current FPS target is %s (%s mspt), running at %s" % ["uncapped" if Engine.max_fps == 0 else str(Engine.max_fps),round(1000.0/Engine.max_fps),Engine.get_frames_per_second()])
 			Engine.max_fps = int(args[1])
-			self.print("FPS target set to %s (%s mspt), running at %s" % [Engine.max_fps,round(1000/Engine.max_fps),Engine.get_frames_per_second()])
+			self.print(" > FPS target set to %s (%s mspt), was running at %s" % [Engine.max_fps,round(1000.0/Engine.max_fps),Engine.get_frames_per_second()])
 		"ai":
-			if args.size() < 2: return print_err("Not enough arguments for command")
+			if args.size() < 2: return print_err(" > Not enough arguments for command")
 			match args[1]:
-				"tree": self.print(Entity.TEMP_CONST_PROCAI.to_string())
+				"tree": self.print(" > %s" % ProcEnt.TEMP_CONST_PROCAI.to_string())
 				"rand":
-					if args.size() < 3: return self.print("Entity AI randomization is %s" % Entity.RAND)
-					Entity.RAND = args[2].to_lower() == "true"
-					self.print("Entity AI randomization set to %s" % Entity.RAND)
+					if args.size() < 3: return self.print(" > ProcEnt randomization is %s" % ProcEnt.RAND)
+					ProcEnt.RAND = args[2].to_lower() == "true"
+					self.print(" > ProcEnt randomization set to %s" % ProcEnt.RAND)
 				"seed":
-					if args.size() < 3: return print_err("Not enough arguments for command")
+					if args.size() < 3: return print_err(" > Not enough arguments for command")
 					seed(args[2].hash())
-					Entity.TEMP_CONST_PROCAI = ProcAI.generate_new()
-					self.print(Entity.TEMP_CONST_PROCAI.to_string())
+					ProcEnt.TEMP_CONST_PROCAI = ProcEnt.generate_new()
+					self.print(" > %s" % ProcEnt.TEMP_CONST_PROCAI.to_string())
 				"root":
-					if args.size() < 3: return print_err("Not enough arguments for command")
+					if args.size() < 3: return print_err(" > Not enough arguments for command")
 					match args[2]:
 						"type":
-							if args.size() < 4: return print_err("Not enough arguments for command")
-							Entity.TEMP_CONST_PROCAI.move_type = int(args[3])
+							if args.size() < 4: return print_err(" > Not enough arguments for command")
+							ProcEnt.TEMP_CONST_PROCAI.move_type = int(args[3])
 				"type":
-					if args.size() < 3: return print_err("Not enough arguments for command")
+					if args.size() < 3: return print_err(" > Not enough arguments for command")
 					Global.TEMP.FORCE_AI_TYPE = int(args[2])
-					self.print("Force AI type set to %s" % ProcAI.move_names[Global.TEMP.FORCE_AI_TYPE])
-				_: print_err("Unknown Command '%s'" % args[1])
+					self.print(" > Force AI type set to %s" % ProcEnt.move_names[Global.TEMP.FORCE_AI_TYPE])
+				_: print_err(" > Unknown Command '%s'" % args[1])
 		"eval":
-			var exp: Expression = Expression.new()
-			exp.parse(" ".join(args.slice(1)))
-			self.print(str(exp.execute()))
-		"test":
-			self.print("%s" % ItemData.ids.ROCK)
-			self.print("%s" % ItemData.lookup(ItemData.ids.ROCK))
-			self.print("%s" % ItemData.lookup(2))
+			var expr: Expression = Expression.new()
+			expr.parse(" ".join(args.slice(1)), ["Global", "Server", "root", "Projectile", "Entity", "Item", "ProcProj", "ProcEnt", "ProcItem"])
+			var output = expr.execute([Global, Server, get_tree().root, Projectile, Entity, Item, ProcProj, ProcEnt, ProcItem], self)
+			self.print(" > " + (str(output) if output != null else "<No output>"))
 		"timescale":
-			if args.size() < 2: return print_err("Not enough arguments for command")
+			if args.size() < 2: return print_err(" > Not enough arguments for command")
 			Engine.time_scale = float(args[1])
-			self.print("Timescale set to %s" % Engine.time_scale)
-		_: print_err("Unknown Command '%s'" % args[0])
+			self.print(" > Timescale set to %s" % Engine.time_scale)
+		"terrain":
+			if args.size() < 2: return self.print(" > Terrain ID: %s" % Server.terrain_id)
+			if !Server.is_host: return print_err(" > Cannot change terrain as client") 
+			self.print(" > Changing Terrain %s -> %s " % [Server.terrain_id, int(args[1])])
+			Global.WORLD.change_terrain(int(args[1]), true)
+		"respawn":
+			if !Global.MAIN_PLAYER: return print_err(" > No player to respawn")
+			Global.MAIN_PLAYER.respawn.rpc()
+			self.print("> Respawned")
+		_: print_err(" > Unknown Command '%s'" % args[0])
 
 func split_in_same_level(text: String, blade: String) -> Array[String]:
 	if !text.contains(blade) || text.is_empty(): return [text]
 	var ret: Array[String] = []
 	var pos: int = 0
 	var dist: int = 0
-	var stack: Array[String]
+	var stack: Array[String] = []
 	while true:
 		if pos + dist >= text.length():
 			ret.append(text.substr(pos))
 			return ret
-		var char: String = text[pos + dist]
-		if char == "\\":
+		var chari: String = text[pos + dist]
+		if chari == "\\":
 			dist += 2
 			continue
-		if !stack.is_empty(): if stack[-1] == char: 
+		if !stack.is_empty(): if stack[-1] == chari: 
 			stack.pop_back()
 			dist += 1
 			continue
@@ -118,11 +152,12 @@ func split_in_same_level(text: String, blade: String) -> Array[String]:
 			pos += dist + 1
 			dist = 0
 		else:
-			match char:
+			match chari:
 				"[": stack.append("]")
 				"{": stack.append("}")
 				"(": stack.append(")")
 				"\"": stack.append("\"")
 			dist += 1
+	# hopefully this code never runs
 	print_err("[SISL-NACPRAV]\tinput: '%s'" % text)
 	return ["NACPRAV"]

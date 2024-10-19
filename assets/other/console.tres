@@ -1,0 +1,7 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://30k0orm342ib"]
+
+[sub_resource type="SystemFont" id="SystemFont_u28ct"]
+font_names = PackedStringArray("Consolas")
+
+[resource]
+default_font = SubResource("SystemFont_u28ct")

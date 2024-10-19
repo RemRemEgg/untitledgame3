@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://ch07baps1p0bg"]
+[gd_scene load_steps=12 format=3 uid="uid://ch07baps1p0bg"]
 
 [ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_cnpwn"]
 [ext_resource type="Texture2D" uid="uid://bxs1frc7lrmxi" path="res://assets/textures/ui/background.png" id="2_7gg1u"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://bfppsujvb7qhi" path="res://assets/textures/ui/button.png" id="4_ir5is"]
 [ext_resource type="Theme" uid="uid://dgcxu3djicdjt" path="res://assets/other/ui_theme_small.tres" id="5_ef1u6"]
 [ext_resource type="Script" path="res://scripts/main_menu_buttons.gd" id="5_u2a4g"]
+[ext_resource type="Shortcut" uid="uid://c5igyny677qf7" path="res://assets/other/ui_go_back.tres" id="6_u6bhb"]
 
 [sub_resource type="SystemFont" id="SystemFont_m3s5m"]
 font_names = PackedStringArray("Rockwell")
@@ -54,7 +55,6 @@ theme_override_constants/margin_bottom = 12
 
 [node name="main" type="Control" parent="margin"]
 layout_mode = 2
-size_flags_horizontal = 4
 
 [node name="vbox" type="VBoxContainer" parent="margin/main"]
 layout_mode = 1
@@ -64,9 +64,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -130.0
-offset_top = -168.0
+offset_top = -131.0
 offset_right = 130.0
-offset_bottom = 168.0
+offset_bottom = 131.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
@@ -255,6 +255,7 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+shortcut = ExtResource("6_u6bhb")
 texture_normal = ExtResource("4_ir5is")
 script = ExtResource("5_u2a4g")
 function = "back"
@@ -308,7 +309,7 @@ text = "multiplayer"
 [node name="ip_input" type="LineEdit" parent="margin/multiplayer/vbox"]
 layout_mode = 2
 theme = ExtResource("5_ef1u6")
-placeholder_text = "IP Address"
+placeholder_text = "127.0.0.1"
 
 [node name="join" type="TextureButton" parent="margin/multiplayer/vbox"]
 layout_mode = 2
@@ -341,6 +342,7 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+shortcut = ExtResource("6_u6bhb")
 texture_normal = ExtResource("4_ir5is")
 script = ExtResource("5_u2a4g")
 function = "back"
