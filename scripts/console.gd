@@ -5,7 +5,7 @@ extends CanvasLayer
 
 var active: bool = true
 var history: Array[String]
-var h_index = -1
+var h_index := -1
 var load_status: int = 0
 var load_call: Callable
 
@@ -41,11 +41,11 @@ func _input(event: InputEvent) -> void:
 		if event.is_action("dbg_console") || (event.is_action("esc") && active): call_deferred("toggle")
 		if event.keycode == KEY_UP:
 			h_index = clamp(h_index +1, -1, history.size() -1)
-			input.text = ""
+			input.clear()
 			if h_index != -1: input.insert_text_at_caret(history[h_index])
 		if event.keycode == KEY_DOWN:
 			h_index = clamp(h_index -1, -1, history.size() -1)
-			input.text = ""
+			input.clear()
 			if h_index != -1: input.insert_text_at_caret(history[h_index])
 
 func toggle() -> void:
@@ -56,8 +56,6 @@ func toggle() -> void:
 	if active:
 		input.grab_focus()
 		input.text = ""
-
-func clear() -> void: lines.text = ""
 
 func submit(text: String) -> void:
 	input.text = ""
@@ -75,11 +73,16 @@ func print_err(text: String) -> void:
 	lines.text += ("\n" if lines.text != "" else "") + "[color=red]" + text + "[/color]"
 
 func parse_command(text: String) -> void:
-	var args: Array[String] = split_in_same_level(text, " ")
+	var commands := split_in_same_level(text, ";")
 	self.print("< " + text)
-	
+	for command in commands:
+		var args := split_in_same_level(command, " ")
+		while args.size() > 0 && args[0] == "": args.pop_front()
+		run_command(args)
+
+func run_command(args: Array[String]) -> void:
 	match args[0]:
-		"clear": clear()
+		"clear": lines.clear()
 		"say": self.print(" ".join(args.slice(1)))
 		"fps":
 			if args.size() < 2: return self.print(" > Current FPS target is %s (%s mspt), running at %s" % ["uncapped" if Engine.max_fps == 0 else str(Engine.max_fps),round(1000.0/Engine.max_fps),Engine.get_frames_per_second()])
@@ -111,8 +114,8 @@ func parse_command(text: String) -> void:
 				_: print_err(" > Unknown Command '%s'" % args[1])
 		"eval":
 			var expr: Expression = Expression.new()
-			expr.parse(" ".join(args.slice(1)), ["Global", "Server", "root", "Projectile", "Entity", "Item", "ProcProj", "ProcEnt", "ProcItem"])
-			var output = expr.execute([Global, Server, get_tree().root, Projectile, Entity, Item, ProcProj, ProcEnt, ProcItem], self)
+			expr.parse(" ".join(args.slice(1)), ["Global", "Server", "root", "Projectile", "Entity", "Item", "ProcProj", "ProcEnt", "ProcItem", "GMP"])
+			var output = expr.execute([Global, Server, get_tree().root, Projectile, Entity, Item, ProcProj, ProcEnt, ProcItem, Global.MAIN_PLAYER], self)
 			self.print(" > " + (str(output) if output != null else "<No output>"))
 		"timescale":
 			if args.size() < 2: return print_err(" > Not enough arguments for command")

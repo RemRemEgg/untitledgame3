@@ -1,7 +1,7 @@
 extends Node2D
 
 @onready var start_game_area: Area2D = $start_game_area as Area2D
-@onready var drop_area: Area2D = $drop_area
+@onready var drop_area: Area2D = $drop_area as Area2D
 @onready var drop_block: StaticBody2D = $drop_block as StaticBody2D
 
 func _process(_delta: float) -> void:

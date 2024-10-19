@@ -33,7 +33,7 @@ func puppetify() -> void:
 	temp_cam.queue_free.call_deferred()
 
 func make_main_player() -> void:
-	get_node("camera").enabled = true
+	(get_node("camera") as Camera).enabled = true
 	Global.MAIN_PLAYER = self
 	is_main_player = true
 

@@ -206,7 +206,7 @@ static func static_create(name_: String, use_type_: int, stats_: Array[float], p
 static var textures: Dictionary = {}
 static func load_texture(path: String) -> ImageTexture:
 	if textures.has(path):
-		return textures.get(path)
+		return textures.get(path) as ImageTexture
 	if !FileAccess.file_exists(path):
 		Console.print_err("Failed to load texture '%s'" % path)
 		return NULL_TEXTURE

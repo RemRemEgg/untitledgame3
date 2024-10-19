@@ -74,7 +74,7 @@ func popup_update(damage: float) -> void:
 		damage += int(lhurt_pop.text)
 		lhurt_pop.queue_free()
 	var apos: Vector2 = self.global_position + Vector2(0.0, -8)
-	lhurt_pop = Global.WORLD.popups_spawner.spawn([str(int(damage)), apos.x, apos.y])
+	lhurt_pop = Global.WORLD.popups_spawner.spawn([str(int(damage)), apos.x, apos.y]) as TextPopup
 
 # TODO update dying
 func die() -> void:

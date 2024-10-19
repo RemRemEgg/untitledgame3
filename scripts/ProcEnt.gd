@@ -33,15 +33,6 @@ static func spawn_random_enemy() -> Entity:
 	var sd_arr: Array[int] = Server.mp_spawn_data.to_array(Server.next_enemy)
 	Global.WORLD.entity_spawner.spawn(sd_arr)
 	return Server.next_enemy
-	#if RAND:
-		#AI_STEP += 1
-		#if AIS.size() == 0 || AI_STEP % int(AIS.size()**1.6) == 0:
-			#var n := ProcEnt.generate_new()
-			#AIS.append(n)
-			#n.register_entity(Server.next_enemy)
-		#else: AIS.pick_random().register_entity(Server.next_enemy)
-	#else: TEMP_CONST_PROCAI.register_entity(Server.next_enemy)
-	#Server.sync_entity_ais()
 
 
 func process(entity_: Entity) -> void:
@@ -63,13 +54,13 @@ func process(entity_: Entity) -> void:
 func update_target() -> void:
 	var min_dist: float = INF
 	var target: Entity = null
-	for t_ent in Global.WORLD.PLAYERS.get_children():
+	for t_ent in Global.get_tree().get_nodes_in_group(&"players"):
 		if !t_ent is Entity: continue
 		if (t_ent.hostile && entity.friendly) || (t_ent.friendly && entity.hostile):
 			var ds := entity.global_position.distance_squared_to(t_ent.global_position)
 			if ds < min_dist:
 				min_dist = ds
-				target = t_ent
+				target = t_ent as Entity
 	entity.target = target
 
 func register() -> void:
@@ -103,7 +94,7 @@ func register_entity(ent: Entity) -> void:
 	ent.mem.resize(0)
 	ent.mem.append_array(init_mem)
 	
-	ent.sprite = ent.get_node("sprite")
+	ent.sprite = ent.get_node("sprite") as Sprite2D
 	ent.sprite.texture = ProcItem.load_texture("res://assets/textures/mobs/type_%s.png" % move_names[move_type]) as Texture2D
 	
 	ent.collision_layer = Global.COLLISION.HOSTILE_ENT

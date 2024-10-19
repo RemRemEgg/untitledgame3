@@ -40,7 +40,7 @@ func register_projectile(proj: Projectile) -> void:
 	proj.pierce = pierce
 	proj.terrain = terrain_active
 	proj.damage *= damage_mod
-	proj.sprite = proj.get_node("sprite")
+	proj.sprite = proj.get_node("sprite") as Sprite2D
 	match base_type:
 		bases.SWING: proj.sprite.texture = ProcItem.load_texture("res://assets/textures/item/sword.png") as Texture2D
 		bases.ARROW: proj.sprite.texture = ProcItem.load_texture("res://assets/textures/item/rock.png") as Texture2D

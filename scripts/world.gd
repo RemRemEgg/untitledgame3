@@ -109,4 +109,4 @@ func clear_terrain() -> void:
 func tp_all_players(tp_pos: Vector2) -> void:
 	for player in PLAYERS.get_children():
 		if player is Player:
-			player.teleport.rpc(tp_pos)
+			(player as Player).teleport.rpc(tp_pos)

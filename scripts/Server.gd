@@ -179,7 +179,7 @@ static func entity_spawn_function(arr: Variant) -> Node:
 	if ProcEnt.AIS.size() <= data.index || ProcEnt.AIS[data.index] == null: return null
 	var ent: Entity = Global.ENTITY_SCENE.instantiate() as Entity
 	ent.proc_ai = ProcEnt.AIS[data.index]
-	ent.sprite = ent.get_node("sprite")
+	ent.sprite = ent.get_node("sprite") as Sprite2D
 	ent.sprite.texture = ProcItem.load_texture("res://assets/textures/mobs/type_%s.png" % ProcEnt.move_names[ent.proc_ai.move_type]) as Texture2D
 	return ent
 
@@ -210,7 +210,7 @@ func projectile_spawn_function(arr: Variant) -> Node:
 	if data.index < 0 || ProcProj.AIS.size() <= data.index: return null
 	var proj: Projectile = Global.PROJECTILE_SCENE.instantiate() as Projectile
 	proj.proc_proj = ProcProj.AIS[data.index]
-	proj.sprite = proj.get_node("sprite")
+	proj.sprite = proj.get_node("sprite") as Sprite2D
 	match proj.proc_proj.base_type:
 		ProcProj.bases.SWING: proj.sprite.texture = ProcItem.load_texture("res://assets/textures/item/sword.png") as Texture2D
 		ProcProj.bases.ARROW: proj.sprite.texture = ProcItem.load_texture("res://assets/textures/item/rock.png") as Texture2D
@@ -219,7 +219,7 @@ func projectile_spawn_function(arr: Variant) -> Node:
 
 func popup_spawn_function(arr: Variant) -> Node:
 	var data: Array = arr as Array
-	var popup = TextPopup.create(data[0], Vector2(data[1], data[2]))
+	var popup: TextPopup = TextPopup.create(data[0], Vector2(data[1], data[2]))
 	return popup
 
 func peer_connected(peer_id: int) -> void: type_print("Peer connected: %s" % peer_id)
